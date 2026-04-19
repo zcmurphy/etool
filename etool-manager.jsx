@@ -1,0 +1,1267 @@
+import { useState, useMemo, useRef, useEffect } from "react";
+
+// ── Modern Minimalist theme ───────────────────────────────────────────────────
+// Charcoal #36454f · Slate Gray #708090 · Light Gray #d3d3d3 · White #ffffff
+const T = {
+  // backgrounds
+  bg:          "#f5f5f5",   // near-white page bg
+  surface:     "#ffffff",   // card / panel surface
+  sidebar:     "#fafafa",   // table header tint
+  // borders
+  border:      "#d3d3d3",   // light gray — theme's bg/divider color
+  borderStrong:"#b0b8be",   // slightly darker for emphasis
+  // primary accent — charcoal as the main interactive color
+  blue:        "#36454f",   // charcoal → primary action / active
+  blueLight:   "#eaecee",   // very light charcoal tint for hover/selected fills
+  // secondary accent — slate gray
+  cyan:        "#708090",   // slate gray → secondary accent
+  // text hierarchy
+  text:        "#1c2b33",   // near-black, slightly warmer than pure black
+  textSec:     "#36454f",   // charcoal for secondary text
+  textMuted:   "#8a9aaa",   // muted — slate-gray lightened
+  // semantic — kept minimal & desaturated to suit the grayscale theme
+  danger:      "#7a3535",   // muted dark red
+  dangerLight: "#f5eded",
+  success:     "#2e5e3e",   // muted dark green
+  successLight:"#edf4f0",
+  warning:     "#6b5020",   // muted dark amber
+  warningLight:"#f5f0e8",
+};
+
+const STATUSES = {
+  Draft:        { color: T.textMuted,  bg: "#efefef"         },
+  "In Design":  { color: T.blue,       bg: T.blueLight       },
+  Procurement:  { color: T.warning,    bg: T.warningLight    },
+  "In Build":   { color: T.cyan,       bg: "#e8ebee"         },
+  Complete:     { color: T.success,    bg: T.successLight    },
+  "On Hold":    { color: T.danger,     bg: T.dangerLight     },
+};
+
+const PRIORITIES = {
+  Critical: { color: T.danger,    bg: T.dangerLight  },
+  High:     { color: T.warning,   bg: T.warningLight },
+  Medium:   { color: T.blue,      bg: T.blueLight    },
+  Low:      { color: T.textMuted, bg: "#efefef"      },
+};
+
+const PHASES = ["Design", "Procurement", "Build"];
+const PORD = { Critical:0, High:1, Medium:2, Low:3 };
+const SORD = { "In Build":0,"In Design":1,Procurement:2,"On Hold":3,Draft:4,Complete:5 };
+
+function daysAgoDate(n) {
+  const x = new Date(); x.setDate(x.getDate() - n);
+  return x.toISOString().slice(0,10);
+}
+function ri(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+const REQUESTERS = ["J. Hartmann","L. Park","A. Singh","R. Chen","M. Torres","K. Novak","S. Osei","T. Wren","D. Farouk","P. Ito","N. Reyes","C. Mueller","B. Adeyemi","F. Larsson","G. Kowalski"];
+
+const PARTS_DATA = [
+  ["Titanium Mounting Bracket","Ti-6Al-4V","Aerospace hinge bracket for wing-flap assembly. Precision machined to ±0.002mm tolerance."],
+  ["Hydraulic Manifold Block","6061-T6 Aluminum","5-port custom manifold rated 5000 PSI. Requires hard-anodize finish and pressure certification."],
+  ["Carbon Fiber Chassis Panel","T700 CFRP","3mm unidirectional layup for chassis reinforcement. Autoclave cure and NDI inspection required."],
+  ["Stainless Valve Housing","316L Stainless","CNC-turned valve body with 1/4-NPT ports. FDA-grade electropolish finish required."],
+  ["Composite Bulkhead Rib","Carbon/Epoxy","Structural rib for fuselage frame section. Post-cure NDI and load test required."],
+  ["Aluminum Heat Sink","6063 Aluminum","Extruded heat sink for 200W power module. 2mm fin pitch, black anodize."],
+  ["Inconel Turbine Vane","Inconel 718","High-temp vane operating at 900°C. EDM finishing and fluorescent penetrant inspection required."],
+  ["Titanium Fastener Kit","Ti-3Al-2.5V","Custom hex-head M8×1.25 fasteners for structural joints. Lot traceability required."],
+  ["PEEK Bearing Cage","PEEK Polymer","30mm OD bearing cage, chemical-resistant, for aggressive-media pump assembly."],
+  ["Steel Spline Shaft","4340 Steel","Precision spline shaft hardened to 58HRC for gearbox interface. Profile ground finish."],
+  ["Beryllium Copper Spring","BeCu C17200","Miniature leaf spring 0.15mm thickness for high-cycle microswitch assembly."],
+  ["Magnesium Gearbox Cover","AZ91D Magnesium","Die-cast cover for weight-critical application. Chromate coat per MIL-DTL-5541."],
+  ["UHMWPE Slide Rail","UHMWPE","Self-lubricating 600mm slide rail for linear actuator, zero-maintenance design."],
+  ["Brass Electrical Terminal","C360 Brass","50A rated crimp terminal block with gold-plated contact surface, UL listed."],
+  ["Hastelloy Reactor Vessel","Hastelloy C-276","Corrosion-resistant 2L vessel rated 150 PSI MAWP for aggressive chemical service."],
+  ["Aluminum Extrusion Frame","6082 Aluminum","80×80mm T-slot extrusion frame for modular equipment enclosure system."],
+  ["Nylon 12 Fluid Fitting","Nylon 12 PA","Push-to-connect 8mm OD tube fitting, 10 bar rated, FDA-compliant material."],
+  ["Tungsten Carbide Insert","WC-Co Grade","Indexable carbide insert for high-speed machining fixture toolholder."],
+  ["Silicon Bronze Bushing","SiB C65500","50mm bore worm-gear bushing, self-lubricated for marine saltwater service."],
+  ["Tool Steel Die Block","D2 Tool Steel","200×150×80mm stamping die block, vacuum heat-treated to 60HRC."],
+  ["Copper Induction Coil","ETP Copper","3-turn induction heating coil, 40mm ID, water-cooled, custom formed to spec."],
+  ["Polycarbonate Window Panel","Lexan 9034","8mm impact-resistant UV-stabilized window panel for enclosure sight glass."],
+  ["Fiberglass Insulating Board","FR4 G10","Structural insulating board for high-voltage switchgear, UL94 V-0 rated."],
+  ["Nitinol Actuator Wire","Ni-Ti SE508","0.5mm shape-memory alloy wire for microactuator mechanism, pre-trained."],
+  ["Ceramic Bearing Race","Si3N4 Ceramic","Full-ceramic bearing inner race, Grade 5 tolerance, for cryogenic pump."],
+  ["Kovar Hermetic Seal","Kovar F-15","20-pin glass-to-metal hermetic feedthrough for vacuum sensor housing."],
+  ["Graphite Electrode Block","Isostatic Graphite","100×100×80mm fine-grain EDM electrode blank for die-sinking application."],
+  ["Acetal Gear Blank","Delrin 500P","Module 2, 80T spur gear blank for low-load conveyor drive, food-grade."],
+  ["Invar Optical Mount","Invar 36","Low-CTE precision optical bench mount for laser alignment system."],
+  ["Monel Pump Impeller","Monel 400","5-blade 120mm diameter marine pump impeller for aggressive seawater service."],
+];
+
+function mkPhase(complete, daysOff) {
+  return {
+    complete,
+    notes: complete ? ri(["Approved and signed off.","Drawings verified.","PO issued, lead time 6wk.","Fabrication complete. QC passed.","Received and inspected.","Cure cycle complete."]) : "",
+    assignee: complete ? ri(REQUESTERS) : "",
+    dueDate: daysAgoDate(daysOff),
+  };
+}
+
+// ── diff engine ───────────────────────────────────────────────────────────────
+const TRACKED_FIELDS = [
+  { key:"title",     label:"Title" },
+  { key:"status",    label:"Status" },
+  { key:"priority",  label:"Priority" },
+  { key:"material",  label:"Material" },
+  { key:"requester", label:"Requester" },
+  { key:"partNumber",label:"Part Number" },
+];
+
+function diffEtool(prev, next) {
+  const changes = [];
+  for (const { key, label } of TRACKED_FIELDS) {
+    if (prev[key] !== next[key]) {
+      changes.push({ field:label, from:prev[key]||"—", to:next[key]||"—" });
+    }
+  }
+  // phase completion diffs
+  for (const ph of PHASES) {
+    const pPrev = prev.phases?.[ph];
+    const pNext = next.phases?.[ph];
+    if (pPrev?.complete !== pNext?.complete) {
+      changes.push({ field:`${ph} phase`, from:pPrev?.complete?"Complete":"Pending", to:pNext?.complete?"Complete":"Pending" });
+    }
+  }
+  return changes;
+}
+
+function makeChangeEntry(changes) {
+  return {
+    id: `chg-${Date.now()}-${Math.random().toString(36).slice(2,6)}`,
+    type: "change",
+    date: new Date().toISOString().slice(0,10),
+    timestamp: new Date().toISOString(),
+    changes,
+  };
+}
+
+const LOG_NOTES = [
+  "Initial requirements reviewed with stakeholder. Scope confirmed.",
+  "CAD model received from design team. Tolerance review in progress.",
+  "Vendor quotes requested from three suppliers.",
+  "Material certification documents received and filed.",
+  "Design review meeting held. Minor changes requested to edge radii.",
+  "Purchase order submitted to preferred vendor.",
+  "Lead time confirmed at 6 weeks. Expected delivery updated.",
+  "First article inspection scheduled for next week.",
+  "Surface finish changed from as-machined to bead blast per customer request.",
+  "Drawing revision B released. Vendors notified.",
+  "Raw material received and logged into inventory.",
+  "Machining commenced. In-process inspection passed.",
+  "Dimensional report reviewed. All critical features within tolerance.",
+  "Final QC inspection complete. Certificate of conformance issued.",
+  "Part shipped to assembly. Tracking number recorded.",
+  "Awaiting updated delivery schedule from supplier.",
+  "Discussed alternate material option with engineering. Decision pending.",
+];
+
+// Seeded status progressions to simulate realistic change history
+const STATUS_PROGRESSIONS = [
+  ["Draft","In Design"],
+  ["Draft","In Design","Procurement"],
+  ["Draft","In Design","Procurement","In Build"],
+  ["Draft","In Design","Procurement","In Build","Complete"],
+  ["In Design","On Hold"],
+  ["Procurement","On Hold"],
+];
+
+function seedLogs(ago, finalStatus) {
+  const entries = [];
+
+  // 1. Seed "created" entry
+  entries.push({
+    id: `chg-seed-created-${Math.random().toString(36).slice(2)}`,
+    type: "change",
+    date: daysAgoDate(ago),
+    timestamp: daysAgoDate(ago) + "T09:00:00Z",
+    changes: [{ field:"Status", from:"—", to:"Draft" }],
+  });
+
+  // 2. Seed status-change events based on final status
+  const progressions = STATUS_PROGRESSIONS.filter(p => p[p.length-1]===finalStatus);
+  const progression = progressions.length ? ri(progressions) : null;
+
+  if (progression && progression.length > 1) {
+    const stepGap = Math.floor((ago - 3) / progression.length);
+    for (let s = 1; s < progression.length; s++) {
+      const stepAgo = ago - (s * stepGap);
+      if (stepAgo > 1) {
+        entries.push({
+          id: `chg-seed-st-${s}-${Math.random().toString(36).slice(2)}`,
+          type: "change",
+          date: daysAgoDate(stepAgo),
+          timestamp: daysAgoDate(stepAgo) + "T10:00:00Z",
+          changes: [{ field:"Status", from:progression[s-1], to:progression[s] }],
+        });
+      }
+    }
+  }
+
+  // 3. Seed some manual notes
+  const noteCount = ri([0,1,1,2,2,3]);
+  for (let k=0; k<noteCount; k++) {
+    const dOffset = Math.floor(Math.random()*(ago-5))+2;
+    entries.push({
+      id: `log-seed-${Math.random().toString(36).slice(2)}`,
+      type: "note",
+      date: daysAgoDate(dOffset),
+      timestamp: daysAgoDate(dOffset) + "T14:00:00Z",
+      note: ri(LOG_NOTES),
+    });
+  }
+
+  return entries.sort((a,b) => b.timestamp.localeCompare(a.timestamp));
+}
+
+const ETOOL_DATA = PARTS_DATA.map(([title, material, description], i) => {
+  const ago = Math.floor(Math.random()*690)+15;
+  const status = ri(["Draft","In Design","In Design","Procurement","Procurement","In Build","Complete","Complete","On Hold"]);
+  const priority = ri(["Critical","Critical","High","High","High","Medium","Medium","Medium","Low"]);
+  const dDone = ["Complete","In Build","Procurement"].includes(status);
+  const pDone = ["Complete","In Build"].includes(status);
+  const bDone = status === "Complete";
+  return {
+    id: `ET-${String(i+1).padStart(3,"0")}`,
+    title, material, description, status, priority,
+    requester: ri(REQUESTERS),
+    partNumber: `${material.replace(/[^A-Za-z]/g,"").slice(0,3).toUpperCase()}-${String(1000+i*41).slice(1)}`,
+    created: daysAgoDate(ago),
+    log: seedLogs(ago, status),    phases: {
+      Design:      mkPhase(dDone, ago-5),
+      Procurement: mkPhase(pDone, ago-35),
+      Build:       mkPhase(bDone, ago-80),
+    },
+  };
+});
+
+const defPhases = () => ({
+  Design:      { complete:false, notes:"", assignee:"", dueDate:"" },
+  Procurement: { complete:false, notes:"", assignee:"", dueDate:"" },
+  Build:       { complete:false, notes:"", assignee:"", dueDate:"" },
+});
+const emptyForm = () => ({ title:"", description:"", status:"Draft", priority:"Medium", requester:"", partNumber:"", material:"", log:[], phases:defPhases() });
+const inputStyle = { width:"100%", background:T.bg, border:`1px solid ${T.border}`, borderRadius:5, color:T.text, fontSize:13, padding:"8px 12px", outline:"none", fontFamily:"inherit", boxSizing:"border-box" };
+
+// ── tiny helpers ──────────────────────────────────────────────────────────────
+function Badge({ s, small }) {
+  const st = STATUSES[s]||STATUSES["Draft"];
+  return <span style={{ fontSize:small?10:11, fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", padding:small?"2px 7px":"3px 9px", borderRadius:4, color:st.color, background:st.bg, whiteSpace:"nowrap" }}>{s}</span>;
+}
+function PriBadge({ p, small }) {
+  const pr = PRIORITIES[p]||PRIORITIES["Medium"];
+  return <span style={{ fontSize:small?10:11, fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", padding:small?"2px 7px":"3px 9px", borderRadius:4, color:pr.color, background:pr.bg, whiteSpace:"nowrap" }}>{p}</span>;
+}
+function PhaseChips({ phases }) {
+  return <div style={{ display:"flex", gap:4 }}>{PHASES.map(p=><span key={p} style={{ fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", padding:"2px 6px", borderRadius:3, background:phases[p]?.complete?T.successLight:"#f1f3f7", color:phases[p]?.complete?T.success:T.textMuted, border:`1px solid ${phases[p]?.complete?"#bbf7d0":T.border}` }}>{p[0]}</span>)}</div>;
+}
+function ProgBar({ phases }) {
+  const done = PHASES.filter(p=>phases[p]?.complete).length;
+  const pct = Math.round((done/PHASES.length)*100);
+  return <div style={{ display:"flex", alignItems:"center", gap:7, minWidth:80 }}>
+    <div style={{ flex:1, height:4, background:T.border, borderRadius:2, overflow:"hidden" }}>
+      <div style={{ width:`${pct}%`, height:"100%", background:pct===100?T.success:T.blue, borderRadius:2 }}/>
+    </div>
+    <span style={{ fontSize:11, color:T.textMuted, minWidth:26, textAlign:"right" }}>{pct}%</span>
+  </div>;
+}
+
+// ── sort arrow SVG ────────────────────────────────────────────────────────────
+function SortArrow({ dir }) {
+  // dir: null | "asc" | "desc"
+  if (!dir) return (
+    <svg width="10" height="12" viewBox="0 0 10 12" fill="none" style={{ opacity:0.35 }}>
+      <path d="M5 1v10M2 4l3-3 3 3M2 8l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+  if (dir==="asc") return (
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+      <path d="M5 9V1M2 4l3-3 3 3" stroke={T.blue} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+  return (
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+      <path d="M5 1v8M2 6l3 3 3-3" stroke={T.blue} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );}
+
+// ── filter funnel SVG ─────────────────────────────────────────────────────────
+function FunnelIcon({ active }) {
+  return (
+    <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style={{ flexShrink:0 }}>
+      <path d="M1 2h10L7 6.5V10L5 11V6.5L1 2z" fill={active?T.blue:"none"} stroke={active?T.blue:T.textMuted} strokeWidth="1.3" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+// ── click-outside hook ────────────────────────────────────────────────────────
+function useOutsideClick(ref, cb) {
+  useEffect(()=>{
+    function h(e) { if (ref.current && !ref.current.contains(e.target)) cb(); }
+    document.addEventListener("mousedown",h);
+    return ()=>document.removeEventListener("mousedown",h);
+  },[ref,cb]);
+}
+
+// ── ColumnFilterDropdown ──────────────────────────────────────────────────────
+function ColFilterDropdown({ colKey, options, selected, onChange, onClose }) {
+  const ref = useRef();
+  useOutsideClick(ref, onClose);
+
+  // options: array of { value, label?, badge? }
+  const allChecked = selected.length === 0;
+
+  const toggle = (val) => {
+    if (val === "__all__") { onChange([]); return; }
+    const next = selected.includes(val) ? selected.filter(x=>x!==val) : [...selected, val];
+    onChange(next);
+  };
+
+  return (
+    <div ref={ref} style={{
+      position:"absolute", top:"calc(100% + 4px)", left:0, zIndex:500,
+      background:T.surface, border:`1.5px solid ${T.borderStrong}`,
+      borderRadius:10, padding:"6px 0", minWidth:180, maxHeight:280, overflowY:"auto",
+      boxShadow:"0 8px 28px rgba(0,0,0,0.11)",
+    }} onClick={e=>e.stopPropagation()}>
+      <div style={{ padding:"4px 12px 8px", borderBottom:`1px solid ${T.border}`, marginBottom:4 }}>
+        <span style={{ fontSize:10, fontWeight:700, color:T.textMuted, textTransform:"uppercase", letterSpacing:"0.08em" }}>Filter by {colKey}</span>
+      </div>
+      {/* All option */}
+      <div onClick={()=>toggle("__all__")} style={{ display:"flex", alignItems:"center", gap:9, padding:"7px 13px", cursor:"pointer", background:allChecked?T.blueLight:"transparent" }}
+        onMouseEnter={e=>{ if(!allChecked) e.currentTarget.style.background=T.bg; }}
+        onMouseLeave={e=>{ if(!allChecked) e.currentTarget.style.background="transparent"; }}>
+        <span style={{ width:14, height:14, borderRadius:3, border:`1.5px solid ${allChecked?T.blue:T.borderStrong}`, background:allChecked?T.blue:"#fff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+          {allChecked && <svg width="8" height="6" viewBox="0 0 8 6"><path d="M1 3l2 2 4-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+        </span>
+        <span style={{ fontSize:12, color:allChecked?T.blue:T.text, fontWeight:allChecked?700:400 }}>All</span>
+      </div>
+      {options.map(opt=>{
+        const checked = selected.includes(opt.value);
+        return (
+          <div key={opt.value} onClick={()=>toggle(opt.value)}
+            style={{ display:"flex", alignItems:"center", gap:9, padding:"7px 13px", cursor:"pointer", background:checked?T.blueLight:"transparent" }}
+            onMouseEnter={e=>{ if(!checked) e.currentTarget.style.background=T.bg; }}
+            onMouseLeave={e=>{ if(!checked) e.currentTarget.style.background="transparent"; }}>
+            <span style={{ width:14, height:14, borderRadius:3, border:`1.5px solid ${checked?T.blue:T.borderStrong}`, background:checked?T.blue:"#fff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+              {checked && <svg width="8" height="6" viewBox="0 0 8 6"><path d="M1 3l2 2 4-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+            </span>
+            {opt.badge ? opt.badge : <span style={{ fontSize:12, color:checked?T.blue:T.text, fontWeight:checked?600:400 }}>{opt.label||opt.value}</span>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── ColumnHeader ──────────────────────────────────────────────────────────────
+function ColHeader({ label, colKey, sortState, onSort, filterOptions, colFilter, onColFilter, filterable }) {
+  const [showFilter, setShowFilter] = useState(false);
+  const wrapRef = useRef();
+
+  // Close filter when clicking outside handled inside ColFilterDropdown
+  const isSorted = sortState?.col === colKey;
+  const sortDir = isSorted ? sortState.dir : null;
+  const isFiltered = colFilter && colFilter.length > 0;
+
+  const handleSort = (e) => {
+    e.stopPropagation();
+    if (!isSorted) { onSort(colKey, "asc"); return; }
+    if (sortDir==="asc") { onSort(colKey,"desc"); return; }
+    onSort(null, null); // clear sort
+  };
+
+  const handleFunnel = (e) => {
+    e.stopPropagation();
+    setShowFilter(p=>!p);
+  };
+
+  return (
+    <div ref={wrapRef} style={{ position:"relative", display:"flex", alignItems:"center", gap:4, userSelect:"none" }}>
+      {/* Sort button */}
+      <button onClick={handleSort} style={{
+        display:"flex", alignItems:"center", gap:4, background:"none", border:"none",
+        padding:"2px 4px", borderRadius:4, cursor:"pointer", color:isSorted?T.blue:T.textMuted,
+        fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.09em",
+        transition:"color 0.15s",
+      }}
+        onMouseEnter={e=>e.currentTarget.style.color=T.blue}
+        onMouseLeave={e=>e.currentTarget.style.color=isSorted?T.blue:T.textMuted}
+      >
+        <span>{label}</span>
+        <SortArrow dir={sortDir}/>
+      </button>
+
+      {/* Filter funnel */}
+      {filterable && (
+        <button onClick={handleFunnel} style={{
+          background:isFiltered?T.blueLight:"none", border:`1px solid ${isFiltered?T.blue:T.border}`,
+          borderRadius:4, padding:"2px 4px", cursor:"pointer", display:"flex", alignItems:"center",
+          transition:"background 0.15s, border-color 0.15s",
+        }}
+          title={`Filter by ${label}`}
+          onMouseEnter={e=>{ e.currentTarget.style.background=T.blueLight; e.currentTarget.style.borderColor=T.blue; }}
+          onMouseLeave={e=>{ e.currentTarget.style.background=isFiltered?T.blueLight:"none"; e.currentTarget.style.borderColor=isFiltered?T.blue:T.border; }}
+        >
+          <FunnelIcon active={isFiltered||showFilter}/>
+        </button>
+      )}
+
+      {showFilter && filterable && (
+        <ColFilterDropdown
+          colKey={label}
+          options={filterOptions}
+          selected={colFilter||[]}
+          onChange={(vals)=>{ onColFilter(colKey, vals); }}
+          onClose={()=>setShowFilter(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── form helpers ──────────────────────────────────────────────────────────────
+function Inp({ label, value, onChange, required, children }) {
+  return <div style={{ marginBottom:12 }}>
+    <label style={{ display:"block", fontSize:11, fontWeight:700, color:T.textSec, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:4 }}>{label}{required&&<span style={{ color:T.danger }}> *</span>}</label>
+    {children||<input type="text" value={value} onChange={e=>onChange(e.target.value)} style={inputStyle} onFocus={e=>e.target.style.borderColor=T.blue} onBlur={e=>e.target.style.borderColor=T.border}/>}
+  </div>;
+}
+function Sel({ label, value, onChange, options }) {
+  return <div style={{ marginBottom:12 }}>
+    <label style={{ display:"block", fontSize:11, fontWeight:700, color:T.textSec, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:4 }}>{label}</label>
+    <select value={value} onChange={e=>onChange(e.target.value)} style={inputStyle}>{options.map(o=><option key={o}>{o}</option>)}</select>
+  </div>;
+}
+function PhSec({ phase, data, onChange }) {
+  return <div style={{ background:T.bg, borderRadius:8, padding:"12px 14px", marginBottom:8, border:`1.5px solid ${data.complete?"#bbf7d0":T.border}` }}>
+    <div style={{ display:"flex", alignItems:"center", gap:9, marginBottom:9 }}>
+      <input type="checkbox" id={`ph-${phase}`} checked={!!data.complete} onChange={e=>onChange({ ...data, complete:e.target.checked })} style={{ width:15, height:15, accentColor:T.blue }}/>
+      <label htmlFor={`ph-${phase}`} style={{ fontSize:12, fontWeight:700, color:data.complete?T.success:T.text, cursor:"pointer", textTransform:"uppercase", letterSpacing:"0.06em" }}>{phase}</label>
+    </div>
+    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7, marginBottom:7 }}>
+      {[["Assignee","text","assignee","Name"],["Due Date","date","dueDate",""]].map(([lbl,typ,key,ph])=>(
+        <div key={key}>
+          <div style={{ fontSize:10, color:T.textMuted, textTransform:"uppercase", letterSpacing:"0.06em", marginBottom:3 }}>{lbl}</div>
+          <input type={typ} value={data[key]||""} onChange={e=>onChange({ ...data,[key]:e.target.value })} placeholder={ph}
+            style={{ width:"100%", background:"#fff", border:`1.5px solid ${T.border}`, borderRadius:5, color:T.text, fontSize:12, padding:"5px 9px", outline:"none", fontFamily:"inherit", boxSizing:"border-box" }}
+            onFocus={e=>e.target.style.borderColor=T.blue} onBlur={e=>e.target.style.borderColor=T.border}/>
+        </div>
+      ))}
+    </div>
+    <input value={data.notes||""} onChange={e=>onChange({ ...data, notes:e.target.value })} placeholder="Notes..."
+      style={{ width:"100%", background:"#fff", border:`1.5px solid ${T.border}`, borderRadius:5, color:T.text, fontSize:12, padding:"5px 9px", outline:"none", fontFamily:"inherit", boxSizing:"border-box" }}
+      onFocus={e=>e.target.style.borderColor=T.blue} onBlur={e=>e.target.style.borderColor=T.border}/>
+  </div>;
+}
+
+// ── field-change pill ─────────────────────────────────────────────────────────
+function FieldChangePill({ field, from, to }) {
+  // Pick a muted arrow color for certain known fields
+  const isStatus   = field === "Status";
+  const isPhase    = field.endsWith("phase");
+  const isPriority = field === "Priority";
+
+  const fromColor  = "#6b7090";
+  const toColor    = isStatus ? T.blue : isPhase ? T.success : isPriority ? T.warning : T.text;
+  const toBg       = isStatus ? T.blueLight : isPhase ? T.successLight : isPriority ? T.warningLight : "#f1f3f7";
+
+  return (
+    <div style={{ display:"flex", alignItems:"center", gap:5, flexWrap:"wrap", marginBottom:4 }}>
+      <span style={{ fontSize:11, fontWeight:700, color:T.textMuted, textTransform:"uppercase", letterSpacing:"0.07em", minWidth:80 }}>{field}</span>
+      <span style={{ fontSize:12, color:fromColor, background:"#f1f3f7", padding:"2px 8px", borderRadius:4, textDecoration:"line-through" }}>{from}</span>
+      <svg width="12" height="10" viewBox="0 0 12 10" fill="none" style={{ flexShrink:0 }}>
+        <path d="M1 5h10M7 1l4 4-4 4" stroke={T.textMuted} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+      <span style={{ fontSize:12, fontWeight:700, color:toColor, background:toBg, padding:"2px 8px", borderRadius:4 }}>{to}</span>
+    </div>
+  );
+}
+
+// ── LogSection ────────────────────────────────────────────────────────────────
+function LogSection({ log, onAddEntry, onDeleteEntry }) {
+  const today = new Date().toISOString().slice(0,10);
+  const [date, setDate]   = useState(today);
+  const [note, setNote]   = useState("");
+  const [filter, setFilter] = useState("all"); // "all" | "notes" | "changes"
+  const scrollRef = useRef();
+
+  const handleAdd = () => {
+    const trimmed = note.trim();
+    if (!trimmed || !date) return;
+    onAddEntry({
+      id: `log-${Date.now()}-${Math.random().toString(36).slice(2,5)}`,
+      type: "note",
+      date,
+      timestamp: new Date().toISOString(),
+      note: trimmed,
+    });
+    setNote("");
+    setDate(today);
+    // scroll to top (newest) after adding
+    setTimeout(()=>{ if(scrollRef.current) scrollRef.current.scrollTop=0; }, 60);
+  };
+
+  const handleKey = (e) => { if (e.key==="Enter" && (e.metaKey||e.ctrlKey)) handleAdd(); };
+
+  const allEntries = [...(log||[])].sort((a,b)=>{
+    const ta = a.timestamp || (a.date+"T00:00:00Z");
+    const tb = b.timestamp || (b.date+"T00:00:00Z");
+    return tb.localeCompare(ta);
+  });
+
+  const visible = filter==="all" ? allEntries
+    : filter==="notes"   ? allEntries.filter(e=>e.type==="note")
+    : allEntries.filter(e=>e.type==="change");
+
+  const noteCount   = allEntries.filter(e=>e.type==="note").length;
+  const changeCount = allEntries.filter(e=>e.type==="change").length;
+
+  const tabStyle = (active) => ({
+    fontSize:11, fontWeight:700, padding:"4px 11px", borderRadius:5, cursor:"pointer",
+    border:"none", letterSpacing:"0.05em", textTransform:"uppercase",
+    background: active ? T.blue : "none",
+    color:      active ? "#fff" : T.textMuted,
+    transition: "background 0.15s, color 0.15s",
+  });
+
+  return (
+    <div style={{ marginTop:24 }}>
+
+      {/* ── header row ── */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <span style={{ fontSize:11, fontWeight:700, color:T.textSec, textTransform:"uppercase", letterSpacing:"0.08em" }}>History &amp; Activity</span>
+          <span style={{ fontSize:10, fontWeight:700, color:T.blue, background:T.blueLight, padding:"1px 7px", borderRadius:10 }}>{allEntries.length}</span>
+        </div>
+        {/* filter tabs */}
+        <div style={{ display:"flex", gap:3, background:T.bg, borderRadius:7, padding:3, border:`1px solid ${T.border}` }}>
+          {[["all","All"],["notes",`Notes ${noteCount}`],["changes",`Changes ${changeCount}`]].map(([v,lbl])=>(
+            <button key={v} onClick={()=>setFilter(v)} style={tabStyle(filter===v)}>{lbl}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── scrollable timeline ── */}
+      <div ref={scrollRef} style={{
+        maxHeight:260, overflowY:"auto", borderRadius:9,
+        border:`1px solid ${T.border}`, background:T.bg, marginBottom:12,
+        position:"relative",
+      }}>
+        {visible.length === 0
+          ? <div style={{ padding:"32px 0", textAlign:"center", color:T.textMuted, fontSize:12 }}>
+              {filter==="all" ? "No history yet. Edit the eTool or add a note below." :
+               filter==="notes" ? "No manual notes yet." : "No auto-recorded changes yet."}
+            </div>
+          : visible.map((entry, idx)=>{
+              const isNote   = entry.type==="note";
+              const isChange = entry.type==="change";
+              const isLast   = idx === visible.length-1;
+
+              return (
+                <div key={entry.id}
+                  style={{
+                    display:"flex", gap:0, borderBottom: isLast?"none":`1px solid ${T.border}`,
+                    position:"relative",
+                  }}
+                  onMouseEnter={e=>{ const d=e.currentTarget.querySelector(".del-btn"); if(d) d.style.opacity="1"; }}
+                  onMouseLeave={e=>{ const d=e.currentTarget.querySelector(".del-btn"); if(d) d.style.opacity="0"; }}
+                >
+                  {/* Timeline spine + dot */}
+                  <div style={{ width:36, flexShrink:0, display:"flex", flexDirection:"column", alignItems:"center", paddingTop:14 }}>
+                    <div style={{
+                      width:9, height:9, borderRadius:"50%", flexShrink:0,
+                      background: isNote ? T.blue : T.border,
+                      border: isNote ? `2px solid ${T.blueLight}` : `2px solid ${T.borderStrong}`,
+                      zIndex:1,
+                    }}/>
+                    {!isLast && <div style={{ width:1, flex:1, background:T.border, marginTop:3 }}/>}
+                  </div>
+
+                  {/* Content */}
+                  <div style={{ flex:1, padding:"12px 12px 12px 4px", minWidth:0 }}>
+
+                    {/* Top row: type tag + date + delete */}
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom: isChange ? 8 : 4 }}>
+                      {/* Type label */}
+                      {isNote
+                        ? <span style={{ fontSize:10, fontWeight:600, color:T.blue, background:T.blueLight, padding:"2px 7px", borderRadius:3, textTransform:"uppercase", letterSpacing:"0.07em", flexShrink:0 }}>Note</span>
+                        : <span style={{ fontSize:10, fontWeight:600, color:T.textMuted, background:"#ebebeb", padding:"2px 7px", borderRadius:3, textTransform:"uppercase", letterSpacing:"0.07em", flexShrink:0 }}>Auto</span>
+                      }
+                      <span style={{ fontSize:11, color:T.textMuted, fontFamily:"monospace", letterSpacing:"0.04em" }}>{entry.date}</span>
+                      <div style={{ flex:1 }}/>
+                      {/* Only manual notes can be deleted */}
+                      {isNote && (
+                        <button className="del-btn" onClick={()=>onDeleteEntry(entry.id)}
+                          style={{ opacity:0, background:"none", border:"none", color:T.textMuted, cursor:"pointer", fontSize:14, lineHeight:1, padding:"2px 5px", borderRadius:4, transition:"opacity 0.15s", flexShrink:0 }}>×</button>
+                      )}
+                    </div>
+
+                    {/* Body */}
+                    {isNote && (
+                      <div style={{ fontSize:13, color:T.text, lineHeight:1.6 }}>{entry.note}</div>
+                    )}
+                    {isChange && entry.changes?.map((c,ci)=>(
+                      <FieldChangePill key={ci} field={c.field} from={c.from} to={c.to}/>
+                    ))}
+                  </div>
+                </div>
+              );
+            })
+        }
+      </div>
+
+      {/* ── add note form ── */}
+      <div style={{ background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:9, padding:"10px 12px" }}>
+        <div style={{ fontSize:10, fontWeight:700, color:T.textMuted, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Add Note</div>
+        <div style={{ display:"flex", gap:8, alignItems:"flex-start" }}>
+          <input type="date" value={date} onChange={e=>setDate(e.target.value)}
+            style={{ flexShrink:0, width:138, background:T.bg, border:`1.5px solid ${T.border}`, borderRadius:6, color:T.text, fontSize:12, padding:"7px 9px", outline:"none", fontFamily:"inherit" }}
+            onFocus={e=>e.target.style.borderColor=T.blue} onBlur={e=>e.target.style.borderColor=T.border}/>
+          <textarea value={note} onChange={e=>setNote(e.target.value)} onKeyDown={handleKey}
+            placeholder="Enter a note… (Ctrl+Enter to submit)" rows={2}
+            style={{ flex:1, background:T.bg, border:`1.5px solid ${T.border}`, borderRadius:6, color:T.text, fontSize:13, padding:"7px 10px", outline:"none", resize:"none", fontFamily:"inherit", lineHeight:1.5 }}
+            onFocus={e=>e.target.style.borderColor=T.blue} onBlur={e=>e.target.style.borderColor=T.border}/>
+          <button onClick={handleAdd} disabled={!note.trim()||!date}
+            style={{ flexShrink:0, background:note.trim()&&date?T.blue:"#c8d5f0", border:"none", borderRadius:6, color:"#fff", fontSize:12, fontWeight:700, padding:"8px 14px", cursor:note.trim()&&date?"pointer":"default", alignSelf:"stretch", transition:"background 0.15s" }}>
+            Add
+          </button>
+        </div>
+        <div style={{ marginTop:6, fontSize:11, color:T.textMuted }}>Manual notes are blue · Auto-recorded changes are gray · Ctrl+Enter to submit</div>
+      </div>
+    </div>
+  );
+}
+
+// ── DetailModal ───────────────────────────────────────────────────────────────
+function DetailModal({ etool, onClose, onSave, onDelete, onAddLog, onDeleteLog }) {
+  const [editing, setEditing] = useState(false);
+  // form is the single source of truth for all displayed data (view + edit modes)
+  const [form, setForm] = useState({ ...etool, phases:{ ...etool.phases }, log:[...(etool.log||[])] });
+
+  // Keep form in sync when parent pushes log updates (add/delete note from App)
+  // but only for the log field, never overwrite in-progress edits
+  useEffect(() => {
+    setForm(f => ({ ...f, log: [...(etool.log||[])] }));
+  }, [etool.log]);
+
+  const upPh = (ph,dat)=>setForm(f=>({ ...f, phases:{ ...f.phases,[ph]:dat } }));
+
+  const save = () => {
+    const changes = diffEtool(etool, form);
+    const finalLog = changes.length > 0
+      ? [...(form.log||[]), makeChangeEntry(changes)]
+      : (form.log||[]);
+    const updatedForm = { ...form, log: finalLog };
+    onSave(updatedForm);
+    setForm(updatedForm); // immediately reflect new log in view mode
+    setEditing(false);
+  };
+
+  // disp = display data, always reads from form state (single source of truth)
+  const disp = form;
+  return (
+    <div style={{ position:"fixed", inset:0, background:"rgba(17,24,39,0.45)", zIndex:200, display:"flex", alignItems:"flex-start", justifyContent:"center", padding:"24px 16px", overflowY:"auto" }}
+      onClick={ev=>{ if(ev.target===ev.currentTarget) onClose(); }}>
+      <div style={{ background:T.surface, border:`1px solid ${T.border}`, borderTop:`3px solid ${T.blue}`, borderRadius:6, width:"100%", maxWidth:680, padding:"26px 28px", position:"relative", boxShadow:"0 8px 32px rgba(0,0,0,0.08)" }}>
+        <button onClick={onClose} style={{ position:"absolute", top:16, right:18, background:"none", border:"none", color:T.textMuted, cursor:"pointer", fontSize:22, lineHeight:1 }}>×</button>
+        <div style={{ marginBottom:18 }}>
+          <div style={{ fontSize:11, fontFamily:"monospace", color:T.cyan, letterSpacing:"0.1em", marginBottom:3 }}>{disp.id}</div>
+          <h2 style={{ margin:"0 0 10px", fontSize:19, fontWeight:800, color:T.text }}>{disp.title}</h2>
+          <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+            <Badge s={disp.status}/>
+            <PriBadge p={disp.priority}/>
+          </div>
+        </div>
+        {!editing ? <>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:9, marginBottom:16 }}>
+            {[["Part #",disp.partNumber],["Material",disp.material],["Requester",disp.requester],["Created",disp.created]].filter(([,v])=>v).map(([k,v])=>(
+              <div key={k} style={{ background:T.bg, borderRadius:7, padding:"9px 13px", border:`1px solid ${T.border}` }}>
+                <div style={{ fontSize:10, color:T.textMuted, textTransform:"uppercase", letterSpacing:"0.07em", marginBottom:3 }}>{k}</div>
+                <div style={{ fontSize:13, color:T.text, fontWeight:600 }}>{v}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ background:T.bg, borderRadius:8, padding:"12px 14px", marginBottom:16, border:`1px solid ${T.border}` }}>
+            <div style={{ fontSize:10, color:T.textMuted, textTransform:"uppercase", letterSpacing:"0.07em", marginBottom:5 }}>Description</div>
+            <div style={{ fontSize:13, color:T.text, lineHeight:1.65 }}>{disp.description}</div>
+          </div>
+          <div style={{ fontSize:11, fontWeight:700, color:T.textSec, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:10 }}>Phases</div>
+          {PHASES.map(ph=>{ const dat=disp.phases[ph]; return (
+            <div key={ph} style={{ borderLeft:`3px solid ${dat.complete?T.success:T.border}`, paddingLeft:14, marginBottom:11 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", marginBottom:dat.notes?3:0 }}>
+                <span style={{ fontSize:12, fontWeight:700, color:dat.complete?T.success:T.text, textTransform:"uppercase", letterSpacing:"0.06em" }}>{ph}</span>
+                <div style={{ display:"flex", gap:14, fontSize:11, color:T.textMuted }}>
+                  {dat.assignee&&<span>{dat.assignee}</span>}
+                  {dat.dueDate&&<span>{dat.dueDate}</span>}
+                  <span style={{ color:dat.complete?T.success:T.textMuted, fontWeight:600 }}>{dat.complete?"✓ Done":"Pending"}</span>
+                </div>
+              </div>
+              {dat.notes&&<div style={{ fontSize:12, color:T.textSec, lineHeight:1.5 }}>{dat.notes}</div>}
+            </div>
+          ); })}
+          <LogSection
+            log={disp.log||[]}
+            onAddEntry={entry=>onAddLog(disp.id, entry)}
+            onDeleteEntry={logId=>onDeleteLog(disp.id, logId)}
+          />
+          <div style={{ display:"flex", gap:9, marginTop:20, paddingTop:16, borderTop:`1px solid ${T.border}` }}>
+            <button onClick={()=>setEditing(true)} style={{ background:T.blue, border:"none", borderRadius:7, color:"#fff", fontSize:13, fontWeight:700, padding:"9px 20px", cursor:"pointer" }}>Edit</button>
+            <button onClick={()=>onDelete(disp.id)} style={{ background:"none", border:`1.5px solid ${T.dangerLight}`, borderRadius:7, color:T.danger, fontSize:13, padding:"9px 18px", cursor:"pointer" }}>Delete</button>
+          </div>
+        </> : <>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:9 }}>
+            <div style={{ gridColumn:"1/-1" }}><Inp label="Title" value={form.title} onChange={v=>setForm(prev=>({ ...prev,title:v }))} required/></div>
+            <Inp label="Part Number" value={form.partNumber} onChange={v=>setForm(prev=>({ ...prev,partNumber:v }))}/>
+            <Inp label="Material" value={form.material} onChange={v=>setForm(prev=>({ ...prev,material:v }))}/>
+            <Inp label="Requester" value={form.requester} onChange={v=>setForm(prev=>({ ...prev,requester:v }))}/>
+            <Sel label="Status" value={form.status} onChange={v=>setForm(prev=>({ ...prev,status:v }))} options={Object.keys(STATUSES)}/>
+            <Sel label="Priority" value={form.priority} onChange={v=>setForm(prev=>({ ...prev,priority:v }))} options={["Critical","High","Medium","Low"]}/>
+          </div>
+          <Inp label="Description" value={form.description} onChange={v=>setForm(prev=>({ ...prev,description:v }))}>
+            <textarea value={form.description} onChange={ev=>setForm(prev=>({ ...prev,description:ev.target.value }))} rows={3} style={{ ...inputStyle,resize:"vertical" }} onFocus={ev=>ev.target.style.borderColor=T.blue} onBlur={ev=>ev.target.style.borderColor=T.border}/>
+          </Inp>
+          <div style={{ fontSize:11, fontWeight:700, color:T.textSec, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:9 }}>Phases</div>
+          {PHASES.map(ph=><PhSec key={ph} phase={ph} data={form.phases[ph]} onChange={dat=>upPh(ph,dat)}/>)}
+          <div style={{ display:"flex", gap:9, marginTop:13 }}>
+            <button onClick={save} style={{ background:T.blue, border:"none", borderRadius:7, color:"#fff", fontSize:13, fontWeight:700, padding:"9px 20px", cursor:"pointer" }}>Save</button>
+            <button onClick={()=>{ setForm({ ...etool, phases:{ ...etool.phases }, log:[...(etool.log||[])] }); setEditing(false); }} style={{ background:"none", border:`1.5px solid ${T.border}`, borderRadius:7, color:T.textSec, fontSize:13, padding:"9px 16px", cursor:"pointer" }}>Cancel</button>
+          </div>
+        </>}
+      </div>
+    </div>
+  );
+}
+
+// ── CreateModal ───────────────────────────────────────────────────────────────
+function CreateModal({ onClose, onCreate, nextId }) {
+  const [form, setForm] = useState(emptyForm());
+  const upPh = (ph,dat)=>setForm(f=>({ ...f,phases:{ ...f.phases,[ph]:dat } }));
+  const submit = ()=>{ if(!form.title.trim()) return; onCreate({ ...form,id:nextId,created:new Date().toISOString().slice(0,10) }); onClose(); };
+  return (
+    <div style={{ position:"fixed", inset:0, background:"rgba(17,24,39,0.45)", zIndex:300, display:"flex", alignItems:"flex-start", justifyContent:"center", padding:"24px 16px", overflowY:"auto" }}
+      onClick={ev=>{ if(ev.target===ev.currentTarget) onClose(); }}>
+      <div style={{ background:T.surface, border:`1px solid ${T.border}`, borderTop:`3px solid ${T.blue}`, borderRadius:6, width:"100%", maxWidth:660, padding:"26px 28px", position:"relative", boxShadow:"0 8px 32px rgba(0,0,0,0.08)" }}>
+        <button onClick={onClose} style={{ position:"absolute", top:16, right:18, background:"none", border:"none", color:T.textMuted, cursor:"pointer", fontSize:22, lineHeight:1 }}>×</button>
+        <div style={{ marginBottom:20 }}>
+          <div style={{ fontSize:11, color:T.cyan, fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:3 }}>{nextId}</div>
+          <h2 style={{ margin:0, fontSize:17, fontWeight:700, color:T.text }}>New eTool Request</h2>
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:9 }}>
+          <div style={{ gridColumn:"1/-1" }}><Inp label="Part / Assembly Title" value={form.title} onChange={v=>setForm(f=>({ ...f,title:v }))} required/></div>
+          <Inp label="Part Number" value={form.partNumber} onChange={v=>setForm(f=>({ ...f,partNumber:v }))}/>
+          <Inp label="Material" value={form.material} onChange={v=>setForm(f=>({ ...f,material:v }))}/>
+          <Inp label="Requester" value={form.requester} onChange={v=>setForm(f=>({ ...f,requester:v }))}/>
+          <Sel label="Priority" value={form.priority} onChange={v=>setForm(f=>({ ...f,priority:v }))} options={["Critical","High","Medium","Low"]}/>
+        </div>
+        <Inp label="Description" value={form.description} onChange={v=>setForm(f=>({ ...f,description:v }))}>
+          <textarea value={form.description} onChange={ev=>setForm(f=>({ ...f,description:ev.target.value }))} rows={3} placeholder="Describe the engineering requirement..." style={{ ...inputStyle,resize:"vertical" }} onFocus={e=>e.target.style.borderColor=T.blue} onBlur={e=>e.target.style.borderColor=T.border}/>
+        </Inp>
+        <div style={{ fontSize:11, fontWeight:700, color:T.textSec, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:9 }}>Phases (optional)</div>
+        {PHASES.map(ph=><PhSec key={ph} phase={ph} data={form.phases[ph]} onChange={dat=>upPh(ph,dat)}/>)}
+        <div style={{ display:"flex", gap:9, marginTop:14 }}>
+          <button onClick={submit} style={{ background:T.blue, border:"none", borderRadius:7, color:"#fff", fontSize:13, fontWeight:800, padding:"10px 24px", cursor:"pointer" }}>Create eTool</button>
+          <button onClick={onClose} style={{ background:"none", border:`1.5px solid ${T.border}`, borderRadius:7, color:T.textSec, fontSize:13, padding:"10px 16px", cursor:"pointer" }}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── FilterModal ───────────────────────────────────────────────────────────────
+// Column definitions for the filter modal
+const FILTER_COLS = [
+  { key:"id",        label:"ID",          type:"text",     placeholder:"e.g. ET-001" },
+  { key:"title",     label:"Title / Part",type:"text",     placeholder:"Search title…" },
+  { key:"partNumber",label:"Part Number", type:"text",     placeholder:"e.g. TIA-041" },
+  { key:"status",    label:"Status",      type:"select",   options:["","Draft","In Design","Procurement","In Build","Complete","On Hold"] },
+  { key:"priority",  label:"Priority",    type:"select",   options:["","Critical","High","Medium","Low"] },
+  { key:"material",  label:"Material",    type:"text",     placeholder:"Search material…" },
+  { key:"requester", label:"Requester",   type:"text",     placeholder:"Search requester…" },
+  { key:"createdFrom",label:"Created — From", type:"date", placeholder:"" },
+  { key:"createdTo",  label:"Created — To",   type:"date", placeholder:"" },
+  { key:"progress",  label:"Progress",    type:"select",   options:["","Not started (0%)","Design done (33%)","Proc done (67%)","Complete (100%)"] },
+];
+
+function FilterModal({ current, onApply, onClose }) {
+  const [draft, setDraft] = useState({ ...current });
+
+  const set = (key, val) => setDraft(prev => ({ ...prev, [key]: val }));
+
+  const handleApply = () => { onApply(draft); onClose(); };
+  const handleClear = () => { setDraft({}); };
+
+  const activeCount = Object.values(draft).filter(v => v && v !== "").length;
+
+  const iStyle = {
+    width:"100%", background:T.bg, border:`1px solid ${T.border}`, borderRadius:5,
+    color:T.text, fontSize:13, padding:"7px 10px", outline:"none",
+    fontFamily:"inherit", boxSizing:"border-box",
+  };
+
+  return (
+    <div style={{ position:"fixed", inset:0, background:"rgba(28,32,40,0.40)", zIndex:400,
+      display:"flex", alignItems:"center", justifyContent:"center", padding:"24px 16px" }}
+      onClick={ev=>{ if(ev.target===ev.currentTarget) onClose(); }}>
+      <div style={{
+        background:T.surface, border:`1px solid ${T.border}`,
+        borderTop:`3px solid ${T.blue}`, borderRadius:6,
+        width:"100%", maxWidth:560, boxShadow:"0 8px 40px rgba(0,0,0,0.10)",
+        display:"flex", flexDirection:"column", maxHeight:"90vh",
+      }}>
+
+        {/* Header */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between",
+          padding:"18px 22px 14px", borderBottom:`1px solid ${T.border}` }}>
+          <div>
+            <div style={{ fontSize:15, fontWeight:700, color:T.text, letterSpacing:"-0.01em" }}>Column Filters</div>
+            <div style={{ fontSize:11, color:T.textMuted, marginTop:2 }}>
+              Set a value for any column to filter the list
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background:"none", border:"none", color:T.textMuted,
+            cursor:"pointer", fontSize:22, lineHeight:1, padding:"2px 6px" }}>×</button>
+        </div>
+
+        {/* Filter rows — scrollable */}
+        <div style={{ overflowY:"auto", flex:1, padding:"6px 0" }}>
+          {FILTER_COLS.map(col => {
+            const val = draft[col.key] || "";
+            return (
+              <div key={col.key} style={{
+                display:"grid", gridTemplateColumns:"160px 1fr",
+                alignItems:"center", gap:14,
+                padding:"10px 22px",
+                borderBottom:`1px solid ${T.border}`,
+              }}>
+                {/* Label */}
+                <div style={{ fontSize:12, fontWeight:600, color:T.textSec,
+                  letterSpacing:"0.02em" }}>{col.label}</div>
+
+                {/* Input */}
+                <div style={{ position:"relative" }}>
+                  {col.type === "select" ? (
+                    <select value={val} onChange={ev=>set(col.key, ev.target.value)}
+                      style={{ ...iStyle }}
+                      onFocus={ev=>ev.target.style.borderColor=T.blue}
+                      onBlur={ev=>ev.target.style.borderColor=T.border}>
+                      {col.options.map(o=>(
+                        <option key={o} value={o}>{o || "— Any —"}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                      <input
+                        type={col.type} value={val}
+                        placeholder={col.placeholder}
+                        onChange={ev=>set(col.key, ev.target.value)}
+                        style={{ ...iStyle, flex:1 }}
+                        onFocus={ev=>ev.target.style.borderColor=T.blue}
+                        onBlur={ev=>ev.target.style.borderColor=T.border}
+                      />
+                      {val && (
+                        <button onClick={()=>set(col.key,"")}
+                          style={{ flexShrink:0, background:"none", border:"none",
+                            color:T.textMuted, cursor:"pointer", fontSize:16,
+                            lineHeight:1, padding:"2px 4px" }}>×</button>
+                      )}
+                    </div>
+                  )}
+                  {/* Active indicator dot */}
+                  {val && (
+                    <div style={{ position:"absolute", top:-3, right: col.type==="select" ? -3 : 28,
+                      width:7, height:7, borderRadius:"50%", background:T.blue,
+                      border:`1.5px solid ${T.surface}` }}/>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding:"14px 22px", borderTop:`1px solid ${T.border}`,
+          display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
+          <button onClick={handleClear}
+            style={{ background:"none", border:`1px solid ${T.border}`, borderRadius:5,
+              color:T.textMuted, fontSize:12, padding:"7px 16px", cursor:"pointer",
+              fontFamily:"inherit" }}>
+            Clear all
+          </button>
+          <div style={{ display:"flex", gap:8 }}>
+            <button onClick={onClose}
+              style={{ background:"none", border:`1px solid ${T.border}`, borderRadius:5,
+                color:T.textSec, fontSize:13, padding:"8px 18px", cursor:"pointer",
+                fontFamily:"inherit" }}>
+              Cancel
+            </button>
+            <button onClick={handleApply}
+              style={{ background:T.blue, border:`1px solid ${T.blue}`, borderRadius:5,
+                color:"#fff", fontSize:13, fontWeight:600, padding:"8px 22px",
+                cursor:"pointer", fontFamily:"inherit" }}>
+              Apply{activeCount > 0 ? ` (${activeCount})` : ""}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── date preset helpers ───────────────────────────────────────────────────────
+const DATE_PRESETS = [
+  { label:"All time", v:"all" },
+  { label:"Last 30 days", v:"30d" },
+  { label:"Last 90 days", v:"90d" },
+  { label:"Last 6 months", v:"6mo" },
+  { label:"Last year", v:"1yr" },
+  { label:"Custom range…", v:"custom" },
+];
+function presetRange(v) {
+  const now = new Date(); const to = now.toISOString().slice(0,10);
+  if (v==="all") return { from:"", to:"" };
+  const f = new Date(now);
+  if (v==="30d") f.setDate(f.getDate()-30);
+  if (v==="90d") f.setDate(f.getDate()-90);
+  if (v==="6mo") f.setMonth(f.getMonth()-6);
+  if (v==="1yr") f.setFullYear(f.getFullYear()-1);
+  return { from:f.toISOString().slice(0,10), to };
+}
+
+// ── column definitions ────────────────────────────────────────────────────────
+// key = field on etool object, or special keys "progress"
+const COLS = [
+  { key:"id",       label:"ID",        width:"76px",            sortable:true,  filterable:false },
+  { key:"title",    label:"Title / Part", width:"minmax(0,1fr)", sortable:true,  filterable:false },
+  { key:"status",   label:"Status",    width:"128px",           sortable:true,  filterable:true  },
+  { key:"priority", label:"Priority",  width:"108px",           sortable:true,  filterable:true  },
+  { key:"progress", label:"Progress",  width:"95px",            sortable:true,  filterable:true  },
+  { key:"material", label:"Material",  width:"128px",           sortable:true,  filterable:true  },
+  { key:"requester",label:"Requester", width:"110px",           sortable:true,  filterable:true  },
+  { key:"created",  label:"Created",   width:"96px",            sortable:true,  filterable:false },
+  { key:"_del",     label:"",          width:"32px",            sortable:false, filterable:false },
+];
+const GRID = COLS.map(c=>c.width).join(" ");
+
+// ── App ───────────────────────────────────────────────────────────────────────
+export default function App() {
+  const [etools, setEtools] = useState(ETOOL_DATA);
+  const [selected, setSelected] = useState(null);
+  const [creating, setCreating] = useState(false);
+
+  // top-bar filters
+  const [search, setSearch]     = useState("");
+  const [dPreset, setDPreset]   = useState("all");
+  const [dFrom, setDFrom]       = useState("");
+  const [dTo, setDTo]           = useState("");
+  const [showDrop, setShowDrop] = useState(false);
+  const dateRef = useRef();
+  useOutsideClick(dateRef, ()=>setShowDrop(false));
+
+  // column sort: { col: key, dir: "asc"|"desc" }
+  const [sortState, setSortState] = useState({ col:"created", dir:"desc" });
+
+  // column header per-column filters (checkbox dropdowns)
+  const [colFilters, setColFilters] = useState({});
+
+  // filter modal
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [modalFilters, setModalFilters]       = useState({});
+
+  const applyPreset = (v)=>{
+    setDPreset(v);
+    if (v!=="custom") { const r=presetRange(v); setDFrom(r.from); setDTo(r.to); setShowDrop(false); }
+  };
+
+  const handleSort = (col, dir) => {
+    if (!col) setSortState({ col:null, dir:null });
+    else setSortState({ col, dir });
+  };
+
+  const handleColFilter = (colKey, vals) => {
+    setColFilters(p=>({ ...p,[colKey]:vals }));
+  };
+
+  const nextId = `ET-${String(etools.length+1).padStart(3,"0")}`;
+
+  // build filter options dynamically from current data
+  const filterOptions = useMemo(()=>({
+    status:   Object.keys(STATUSES).map(v=>({ value:v, badge:<Badge s={v} small/> })),
+    priority: Object.keys(PRIORITIES).map(v=>({ value:v, badge:<PriBadge p={v} small/> })),
+    progress: [
+      { value:"0",   label:"Not started (0%)" },
+      { value:"33",  label:"Design done (33%)" },
+      { value:"67",  label:"Proc done (67%)" },
+      { value:"100", label:"Complete (100%)" },
+    ],
+    material: [...new Set(ETOOL_DATA.map(e=>e.material))].sort().map(v=>({ value:v, label:v })),
+    requester:[...new Set(ETOOL_DATA.map(e=>e.requester))].sort().map(v=>({ value:v, label:v })),
+  }),[]);
+
+  function progressBucket(etool) {
+    const done = PHASES.filter(p=>etool.phases[p]?.complete).length;
+    return String(Math.round((done/PHASES.length)*100));
+  }
+
+  const filtered = useMemo(()=>{
+    const mf = modalFilters;
+    // helper: progress label → bucket value
+    const progressLabelMap = {
+      "Not started (0%)":"0", "Design done (33%)":"33",
+      "Proc done (67%)":"67", "Complete (100%)":"100",
+    };
+
+    let list = etools.filter(e=>{
+      const q = search.toLowerCase();
+      if (q && !([e.title,e.id,e.partNumber||"",e.material||"",e.requester||""].some(s=>s.toLowerCase().includes(q)))) return false;
+      if (!(!dFrom||e.created>=dFrom)) return false;
+      if (!(!dTo||e.created<=dTo)) return false;
+
+      // column header checkbox filters
+      for (const [col, vals] of Object.entries(colFilters)) {
+        if (!vals||vals.length===0) continue;
+        if (col==="status"   && !vals.includes(e.status))    return false;
+        if (col==="priority" && !vals.includes(e.priority))  return false;
+        if (col==="material" && !vals.includes(e.material))  return false;
+        if (col==="requester"&& !vals.includes(e.requester)) return false;
+        if (col==="progress" && !vals.includes(progressBucket(e))) return false;
+      }
+
+      // modal filters — text fields are case-insensitive substring matches
+      if (mf.id         && !e.id.toLowerCase().includes(mf.id.toLowerCase()))               return false;
+      if (mf.title      && !e.title.toLowerCase().includes(mf.title.toLowerCase()))          return false;
+      if (mf.partNumber && !(e.partNumber||"").toLowerCase().includes(mf.partNumber.toLowerCase())) return false;
+      if (mf.status     && e.status !== mf.status)                                           return false;
+      if (mf.priority   && e.priority !== mf.priority)                                       return false;
+      if (mf.material   && !e.material.toLowerCase().includes(mf.material.toLowerCase()))    return false;
+      if (mf.requester  && !e.requester.toLowerCase().includes(mf.requester.toLowerCase()))  return false;
+      if (mf.createdFrom && e.created < mf.createdFrom)                                      return false;
+      if (mf.createdTo  && e.created > mf.createdTo)                                         return false;
+      if (mf.progress) {
+        const bucket = progressLabelMap[mf.progress];
+        if (bucket && progressBucket(e) !== bucket)                                          return false;
+      }
+
+      return true;
+    });
+
+    if (sortState.col) {
+      list = [...list].sort((a,b)=>{
+        let av, bv;
+        if (sortState.col==="id")       { av=a.id; bv=b.id; }
+        else if (sortState.col==="title")    { av=a.title.toLowerCase(); bv=b.title.toLowerCase(); }
+        else if (sortState.col==="status")   { av=SORD[a.status]??9; bv=SORD[b.status]??9; }
+        else if (sortState.col==="priority") { av=PORD[a.priority]??9; bv=PORD[b.priority]??9; }
+        else if (sortState.col==="progress") { av=Number(progressBucket(a)); bv=Number(progressBucket(b)); }
+        else if (sortState.col==="material") { av=a.material.toLowerCase(); bv=b.material.toLowerCase(); }
+        else if (sortState.col==="requester"){ av=a.requester.toLowerCase(); bv=b.requester.toLowerCase(); }
+        else if (sortState.col==="created")  { av=a.created; bv=b.created; }
+        else return 0;
+        if (av<bv) return sortState.dir==="asc"?-1:1;
+        if (av>bv) return sortState.dir==="asc"?1:-1;
+        return 0;
+      });
+    }
+    return list;
+  }, [etools, search, dFrom, dTo, colFilters, modalFilters, sortState]);
+
+  const stats = useMemo(()=>({
+    showing:filtered.length, total:etools.length,
+    active:filtered.filter(e=>["In Design","Procurement","In Build"].includes(e.status)).length,
+    complete:filtered.filter(e=>e.status==="Complete").length,
+    critical:filtered.filter(e=>e.priority==="Critical").length,
+  }),[filtered,etools]);
+
+  const handleSave = (u) => { setEtools(p=>p.map(e=>e.id===u.id?u:e)); setSelected(u); };
+  const handleDelete = (id) => { if(window.confirm("Delete this eTool?")){ setEtools(p=>p.filter(e=>e.id!==id)); setSelected(null); } };
+
+  const handleAddLog = (etoolId, entry) => {
+    setEtools(p=>p.map(e=>e.id===etoolId ? { ...e, log:[...(e.log||[]), entry] } : e));
+    setSelected(s=>s && s.id===etoolId ? { ...s, log:[...(s.log||[]), entry] } : s);
+  };
+  const handleDeleteLog = (etoolId, logId) => {
+    setEtools(p=>p.map(e=>e.id===etoolId ? { ...e, log:(e.log||[]).filter(l=>l.id!==logId) } : e));
+    setSelected(s=>s && s.id===etoolId ? { ...s, log:(s.log||[]).filter(l=>l.id!==logId) } : s);
+  };
+
+  const modalFilterCount = Object.values(modalFilters).filter(v=>v&&v!=="").length;
+  const hasFilters = search || dFrom || dTo
+    || Object.values(colFilters).some(v=>v&&v.length>0)
+    || modalFilterCount > 0;
+  const clearAll = () => {
+    setSearch(""); applyPreset("all"); setColFilters({}); setModalFilters({});
+  };
+
+  const presetLabel = dPreset==="custom"
+    ? (dFrom||dTo?`${dFrom||"…"} → ${dTo||"…"}`:"Custom")
+    : DATE_PRESETS.find(x=>x.v===dPreset)?.label;
+
+  const filterBarSel = { background:T.bg, border:`1px solid ${T.border}`, borderRadius:5, color:T.textSec, fontSize:12, padding:"7px 11px", outline:"none", fontFamily:"inherit", cursor:"pointer" };
+
+  return (
+    <div style={{ background:T.bg, minHeight:"100vh", fontFamily:"'DM Sans','Helvetica Neue',Arial,sans-serif", color:T.text }}>
+      <h2 className="sr-only">eTool Engineering Request Manager</h2>
+
+      {/* Header */}
+      <div style={{ background:T.surface, borderBottom:`1px solid ${T.border}`, padding:"0 28px", position:"sticky", top:0, zIndex:50 }}>
+        <div style={{ maxWidth:1440, margin:"0 auto", display:"flex", alignItems:"center", justifyContent:"space-between", height:54 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <div style={{ width:26, height:26, borderRadius:5, background:T.blue, display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="4.5" height="4.5" rx="1" fill="white"/><rect x="7.5" y="1" width="4.5" height="4.5" rx="1" fill="white"/><rect x="1" y="7.5" width="4.5" height="4.5" rx="1" fill="white"/><rect x="7.5" y="7.5" width="4.5" height="4.5" rx="1" fill="white"/></svg>
+            </div>
+            <span style={{ fontSize:14, fontWeight:700, color:T.text, letterSpacing:"-0.02em" }}>eTool Manager</span>
+            <span style={{ fontSize:10, color:T.textMuted, background:"transparent", borderLeft:`2px solid ${T.border}`, paddingLeft:10, letterSpacing:"0.12em", fontWeight:500 }}>ENGINEERING</span>
+          </div>
+          <button onClick={()=>setCreating(true)} style={{ background:T.blue, border:`1px solid ${T.blue}`, borderRadius:5, color:"#fff", fontSize:12, fontWeight:600, padding:"7px 16px", cursor:"pointer", letterSpacing:"0.04em" }}>+ New eTool</button>
+        </div>
+      </div>
+
+      <div style={{ maxWidth:1440, margin:"0 auto", padding:"20px 28px" }}>
+
+        {/* Stat strip */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10, marginBottom:18 }}>
+          {[
+            { label:"Showing",  value:stats.showing,  sub:`of ${stats.total} eTools`, color:T.text     },
+            { label:"Active",   value:stats.active,   sub:"in progress",              color:T.cyan     },
+            { label:"Complete", value:stats.complete, sub:"finished",                 color:T.success  },
+            { label:"Critical", value:stats.critical, sub:"high priority",            color:T.danger   },
+          ].map(s=>(
+            <div key={s.label} style={{ background:T.surface, border:`1px solid ${T.border}`, borderRadius:8, padding:"12px 17px" }}>
+              <div style={{ fontSize:10, color:T.textMuted, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:4, fontWeight:500 }}>{s.label}</div>
+              <div style={{ fontSize:22, fontWeight:700, color:s.color, letterSpacing:"-0.03em", lineHeight:1.1 }}>{s.value}</div>
+              <div style={{ fontSize:11, color:T.textMuted, marginTop:2 }}>{s.sub}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Filter bar */}
+        <div style={{ background:T.surface, border:`1px solid ${T.border}`, borderRadius:10, padding:"12px 16px", marginBottom:14 }}>
+          <div style={{ display:"flex", gap:8, flexWrap:"wrap", alignItems:"center" }}>
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search title, part #, material, requester…"
+              style={{ flex:"1 1 200px", background:T.bg, border:`1.5px solid ${T.border}`, borderRadius:7, color:T.text, fontSize:13, padding:"7px 13px", outline:"none", fontFamily:"inherit" }}
+              onFocus={e=>e.target.style.borderColor=T.blue} onBlur={e=>e.target.style.borderColor=T.border}/>
+
+            {/* Date preset */}
+            <div ref={dateRef} style={{ position:"relative" }}>
+              <button onClick={()=>setShowDrop(p=>!p)} style={{
+                background:dPreset!=="all"?T.blueLight:T.bg,
+                border:`1.5px solid ${dPreset!=="all"?T.blue:T.border}`,
+                borderRadius:7, color:dPreset!=="all"?T.blue:T.textSec,
+                fontSize:12, fontWeight:dPreset!=="all"?700:500, padding:"7px 13px", cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap",
+              }}>
+                <span style={{ marginRight:5 }}>📅</span>{presetLabel}
+              </button>
+              {showDrop && (
+                <div style={{ position:"absolute", top:"calc(100% + 6px)", left:0, zIndex:300, background:T.surface, border:`1.5px solid ${T.borderStrong}`, borderRadius:10, padding:"8px 0", minWidth:230, boxShadow:"0 8px 28px rgba(0,0,0,0.09)" }}>
+                  {DATE_PRESETS.map(p=>(
+                    <div key={p.v} onClick={()=>applyPreset(p.v)} style={{ padding:"8px 14px", cursor:"pointer", fontSize:13, fontWeight:dPreset===p.v?700:400, color:dPreset===p.v?T.blue:T.text, background:dPreset===p.v?T.blueLight:"transparent" }}>{p.label}</div>
+                  ))}
+                  {dPreset==="custom" && (
+                    <div style={{ borderTop:`1px solid ${T.border}`, paddingTop:9, marginTop:4, padding:"9px 14px 12px" }}>
+                      <div style={{ fontSize:11, color:T.textMuted, marginBottom:7, textTransform:"uppercase", letterSpacing:"0.07em" }}>Custom Range</div>
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7, marginBottom:9 }}>
+                        {[["From",dFrom,setDFrom],["To",dTo,setDTo]].map(([lbl,val,set])=>(
+                          <div key={lbl}>
+                            <div style={{ fontSize:10, color:T.textMuted, marginBottom:3 }}>{lbl}</div>
+                            <input type="date" value={val} onChange={e=>set(e.target.value)}
+                              style={{ width:"100%", background:T.bg, border:`1.5px solid ${T.border}`, borderRadius:5, color:T.text, fontSize:11, padding:"5px 7px", outline:"none", fontFamily:"inherit", boxSizing:"border-box" }}
+                              onFocus={e=>e.target.style.borderColor=T.blue} onBlur={e=>e.target.style.borderColor=T.border}/>
+                          </div>
+                        ))}
+                      </div>
+                      <button onClick={()=>setShowDrop(false)} style={{ width:"100%", background:T.blue, border:"none", borderRadius:6, color:"#fff", fontSize:12, fontWeight:700, padding:"7px", cursor:"pointer" }}>Apply</button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Filter modal button */}
+            <button onClick={()=>setShowFilterModal(true)} style={{
+              background: modalFilterCount > 0 ? T.blue : T.bg,
+              border: `1px solid ${modalFilterCount > 0 ? T.blue : T.border}`,
+              borderRadius:5, color: modalFilterCount > 0 ? "#fff" : T.textSec,
+              fontSize:12, fontWeight: modalFilterCount > 0 ? 600 : 500,
+              padding:"7px 14px", cursor:"pointer", fontFamily:"inherit",
+              display:"flex", alignItems:"center", gap:6, whiteSpace:"nowrap",
+            }}>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M1 2h10L7 6.5V10L5 11V6.5L1 2z"
+                  fill={modalFilterCount>0?"rgba(255,255,255,0.25)":"none"}
+                  stroke={modalFilterCount>0?"#fff":T.textSec}
+                  strokeWidth="1.2" strokeLinejoin="round"/>
+              </svg>
+              Filter{modalFilterCount > 0 ? ` (${modalFilterCount})` : ""}
+            </button>
+
+            {hasFilters && (
+              <button onClick={clearAll} style={{ background:"none", border:`1px solid ${T.border}`, borderRadius:5, color:T.textMuted, fontSize:12, padding:"7px 13px", cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap" }}>
+                Clear all ×
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* List table */}
+        <div style={{ background:T.surface, border:`1px solid ${T.border}`, borderRadius:10, overflow:"visible" }}>
+
+          {/* Column headers */}
+          <div style={{ display:"grid", gridTemplateColumns:GRID, gap:10, padding:"10px 18px", borderBottom:`1px solid ${T.border}`, background:T.sidebar, borderRadius:"10px 10px 0 0", alignItems:"center" }}>
+            {COLS.map(col=>(
+              <ColHeader
+                key={col.key}
+                label={col.label}
+                colKey={col.key}
+                sortState={sortState}
+                onSort={col.sortable ? handleSort : ()=>{}}
+                filterable={col.filterable}
+                filterOptions={filterOptions[col.key]||[]}
+                colFilter={colFilters[col.key]||[]}
+                onColFilter={handleColFilter}
+              />
+            ))}
+          </div>
+
+          {/* Rows */}
+          {filtered.length===0
+            ? <div style={{ textAlign:"center", padding:"48px 0", color:T.textMuted }}>
+                <div style={{ fontSize:28, marginBottom:9 }}>⚙</div>
+                <div style={{ fontSize:14, fontWeight:600, color:T.textSec, marginBottom:4 }}>No eTools match your filters</div>
+                <div style={{ fontSize:12 }}>Try adjusting the search, date range, or column filters.</div>
+              </div>
+            : filtered.map((e, idx)=>(
+              <div key={e.id} onClick={()=>setSelected(e)}
+                style={{ display:"grid", gridTemplateColumns:GRID, gap:10, padding:"11px 18px", alignItems:"center", cursor:"pointer", borderBottom:idx<filtered.length-1?`1px solid ${T.border}`:"none", transition:"background 0.1s" }}
+                onMouseEnter={ev=>ev.currentTarget.style.background="#efefef"}
+                onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
+                <div style={{ fontSize:11, fontFamily:"monospace", color:T.cyan, fontWeight:600, letterSpacing:"0.06em" }}>{e.id}</div>
+                <div style={{ minWidth:0 }}>
+                  <div style={{ fontSize:13, fontWeight:600, color:T.text, marginBottom:3, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{e.title}</div>
+                  <div style={{ display:"flex", gap:7, alignItems:"center" }}>
+                    <span style={{ fontSize:11, color:T.textMuted, fontFamily:"monospace" }}>{e.partNumber}</span>
+                    <PhaseChips phases={e.phases}/>
+                  </div>
+                </div>
+                <div><Badge s={e.status} small/></div>
+                <div><PriBadge p={e.priority} small/></div>
+                <ProgBar phases={e.phases}/>
+                <div style={{ fontSize:12, color:T.textSec, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{e.material}</div>
+                <div style={{ fontSize:12, color:T.textSec, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{e.requester}</div>
+                <div style={{ fontSize:12, color:T.textMuted }}>{e.created}</div>
+                <button onClick={ev=>{ ev.stopPropagation(); handleDelete(e.id); }} style={{ background:"none", border:"none", color:T.textMuted, cursor:"pointer", fontSize:15, borderRadius:4, padding:"3px 6px", lineHeight:1 }} title="Delete">×</button>
+              </div>
+            ))
+          }
+        </div>
+
+        <div style={{ marginTop:10, fontSize:12, color:T.textMuted, textAlign:"right" }}>
+          {filtered.length} result{filtered.length!==1?"s":""}{hasFilters?` · filtered from ${etools.length}`:""}
+        </div>
+      </div>
+
+      {selected&&<DetailModal etool={selected} onClose={()=>setSelected(null)} onSave={handleSave} onDelete={handleDelete} onAddLog={handleAddLog} onDeleteLog={handleDeleteLog}/>}
+      {creating&&<CreateModal onClose={()=>setCreating(false)} onCreate={e=>setEtools(p=>[e,...p])} nextId={nextId}/>}
+      {showFilterModal&&<FilterModal current={modalFilters} onApply={setModalFilters} onClose={()=>setShowFilterModal(false)}/>}
+    </div>
+  );
+}
