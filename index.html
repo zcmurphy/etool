@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eTool Manager — Engineering</title>
+  <meta name="description" content="eTool engineering request management — design, procurement, and build tracking." />
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2336454f'/><rect x='5' y='5' width='9' height='9' rx='2' fill='white'/><rect x='18' y='5' width='9' height='9' rx='2' fill='white'/><rect x='5' y='18' width='9' height='9' rx='2' fill='white'/><rect x='18' y='18' width='9' height='9' rx='2' fill='white'/></svg>" />
+
+  <!-- DM Sans — matches the Modern Minimalist theme typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f5f5;
+      color: #1c2b33;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    #root { min-height: 100vh; }
+
+    /* ── Loading screen ─────────────────────────────── */
+    #loading {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: #f5f5f5; gap: 18px; z-index: 9999;
+      transition: opacity 0.3s ease;
+    }
+    #loading.fade { opacity: 0; pointer-events: none; }
+
+    .ld-mark {
+      width: 40px; height: 40px; border-radius: 9px;
+      background: #36454f; display: grid;
+      grid-template-columns: 1fr 1fr; gap: 5px; padding: 9px;
+    }
+    .ld-mark span { background: white; border-radius: 2px; animation: ldpulse 1.3s ease-in-out infinite; }
+    .ld-mark span:nth-child(2) { animation-delay: 0.15s; }
+    .ld-mark span:nth-child(3) { animation-delay: 0.30s; }
+    .ld-mark span:nth-child(4) { animation-delay: 0.45s; }
+    @keyframes ldpulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .ld-text {
+      font-size: 12px; font-weight: 500; color: #708090;
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+
+    /* ── Scrollbar ──────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d3d3d3; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #b0b8be; }
+
+    /* ── Misc fixes ─────────────────────────────────── */
+    input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.45; cursor: pointer; }
+    :focus-visible { outline: 2px solid #36454f; outline-offset: 2px; }
+    select { -moz-appearance: none; }
+
+    /* ── Error banner ───────────────────────────────── */
+    #error-banner {
+      display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: #7a3535; color: white; font-size: 13px; padding: 12px 20px;
+      border-radius: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      max-width: 500px; text-align: center; z-index: 9998;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading">
+    <div class="ld-mark"><span></span><span></span><span></span><span></span></div>
+    <div class="ld-text">Loading eTool Manager</div>
+  </div>
+
+  <div id="root"></div>
+  <div id="error-banner"></div>
+
+  <!--
+    HOW THIS WORKS
+    ──────────────
+    1. React 18 + ReactDOM are loaded as UMD globals (window.React, window.ReactDOM).
+    2. Babel Standalone transpiles JSX and modern JS in the browser at runtime —
+       no build step required. Just open index.html from a local server or file://.
+    3. The app source (etool-manager.jsx) sits in the same folder as this file.
+       Babel fetches, transpiles, and evals it automatically via the
+       data-plugins attribute and the custom "react" import rewrite below.
+
+    TO RUN LOCALLY
+    ──────────────
+    Option A (Python — no install):
+      cd /path/to/this/folder
+      python3 -m http.server 8080
+      open http://localhost:8080
+
+    Option B (Node — no install):
+      npx serve .
+      open http://localhost:3000
+
+    Option C (VS Code):
+      Install the "Live Server" extension and click "Go Live".
+
+    NOTE: Opening index.html directly as a file:// URL may work in some
+    browsers but cross-origin restrictions can block loading etool-manager.jsx.
+    A local HTTP server (any of the above) is recommended.
+  -->
+
+  <!-- React 18 UMD (globals: React, ReactDOM) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+  <!-- Babel Standalone 7 — in-browser JSX + ES2022 transform -->
+  <script src="https://unpkg.com/@babel/standalone@7.23.9/babel.min.js"></script>
+
+  <script>
+    // ── Register a Babel plugin that rewrites:
+    //      import { useState, ... } from "react"
+    //   to use the UMD global instead of a real module specifier.
+    // This is necessary because Babel standalone doesn't resolve node_modules.
+    Babel.registerPlugin("rewrite-react-import", function({ types: t }) {
+      return {
+        visitor: {
+          ImportDeclaration(path) {
+            if (path.node.source.value === "react") {
+              // Replace the import with:
+              //   const { useState, useMemo, ... } = React;
+              const specifiers = path.node.specifiers.map(s =>
+                t.objectProperty(
+                  t.identifier(s.imported.name),
+                  t.identifier(s.local.name),
+                  false,
+                  s.imported.name === s.local.name
+                )
+              );
+              path.replaceWith(
+                t.variableDeclaration("const", [
+                  t.variableDeclarator(
+                    t.objectPattern(specifiers),
+                    t.identifier("React")
+                  )
+                ])
+              );
+            }
+          }
+        }
+      };
+    });
+  </script>
+
+  <!--
+    Load and transpile the app.
+    • type="text/babel"        → Babel standalone processes this tag
+    • data-plugins             → activates our rewrite-react-import plugin
+    • data-presets             → enables React JSX + modern JS syntax
+    • src                      → loads etool-manager.jsx from same directory
+  -->
+  <script
+    type="text/babel"
+    src="etool-manager.jsx"
+    data-plugins="rewrite-react-import"
+    data-presets="react,env"
+  ></script>
+
+  <!-- Mount the app after Babel has finished transpiling -->
+  <script>
+    // Babel standalone is synchronous when processing inline scripts but
+    // async when fetching external src= files. We poll until App is defined.
+    (function mount() {
+      if (typeof App === "undefined") {
+        // App not yet available — retry in 50ms
+        setTimeout(mount, 50);
+        return;
+      }
+      try {
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(React.createElement(App));
+
+        // Fade and remove the loading screen
+        const loader = document.getElementById("loading");
+        loader.classList.add("fade");
+        setTimeout(() => { if (loader.parentNode) loader.parentNode.removeChild(loader); }, 400);
+      } catch (err) {
+        console.error("eTool Manager mount error:", err);
+        const banner = document.getElementById("error-banner");
+        banner.textContent = "Failed to start: " + err.message;
+        banner.style.display = "block";
+        document.getElementById("loading").style.display = "none";
+      }
+    })();
+  </script>
+
+</body>
+</html>
