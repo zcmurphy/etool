@@ -1,6 +1,8 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 
-// ── Modern Minimalist theme ───────────────────────────────────────────────────
+const BUILD = "ca785a8";
+
+
 // Charcoal #36454f · Slate Gray #708090 · Light Gray #d3d3d3 · White #ffffff
 const T = {
   // backgrounds
@@ -456,35 +458,13 @@ function PhSec({ phase, data, onChange }) {
 }
 
 // ── field-change pill ─────────────────────────────────────────────────────────
-function FieldChangePill({ field, from, to }) {
-  // Pick a muted arrow color for certain known fields
-  const isStatus   = field === "Status";
-  const isPhase    = field.endsWith("phase");
-  const isPriority = field === "Priority";
-
-  const fromColor  = "#6b7090";
-  const toColor    = isStatus ? T.blue : isPhase ? T.success : isPriority ? T.warning : T.text;
-  const toBg       = isStatus ? T.blueLight : isPhase ? T.successLight : isPriority ? T.warningLight : "#f1f3f7";
-
-  return (
-    <div style={{ display:"flex", alignItems:"center", gap:5, flexWrap:"wrap", marginBottom:4 }}>
-      <span style={{ fontSize:11, fontWeight:700, color:T.textMuted, textTransform:"uppercase", letterSpacing:"0.07em", minWidth:80 }}>{field}</span>
-      <span style={{ fontSize:12, color:fromColor, background:"#f1f3f7", padding:"2px 8px", borderRadius:4, textDecoration:"line-through" }}>{from}</span>
-      <svg width="12" height="10" viewBox="0 0 12 10" fill="none" style={{ flexShrink:0 }}>
-        <path d="M1 5h10M7 1l4 4-4 4" stroke={T.textMuted} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-      <span style={{ fontSize:12, fontWeight:700, color:toColor, background:toBg, padding:"2px 8px", borderRadius:4 }}>{to}</span>
-    </div>
-  );
-}
-
-// ── LogSection ────────────────────────────────────────────────────────────────
+// ── LogSection — ledger table layout ─────────────────────────────────────────
 function LogSection({ log, onAddEntry, onDeleteEntry }) {
   const today = new Date().toISOString().slice(0,10);
-  const [date, setDate]   = useState(today);
-  const [note, setNote]   = useState("");
-  const [filter, setFilter] = useState("all"); // "all" | "notes" | "changes"
-  const scrollRef = useRef();
+  const [date, setDate] = useState(today);
+  const [note, setNote] = useState("");
+  const [filter, setFilter] = useState("all");
+  const tableRef = useRef();
 
   const handleAdd = () => {
     const trimmed = note.trim();
@@ -498,137 +478,173 @@ function LogSection({ log, onAddEntry, onDeleteEntry }) {
     });
     setNote("");
     setDate(today);
-    // scroll to top (newest) after adding
-    setTimeout(()=>{ if(scrollRef.current) scrollRef.current.scrollTop=0; }, 60);
+    setTimeout(()=>{ if(tableRef.current) tableRef.current.scrollTop = 0; }, 60);
   };
 
-  const handleKey = (e) => { if (e.key==="Enter" && (e.metaKey||e.ctrlKey)) handleAdd(); };
+  const handleKey = (ev) => { if (ev.key==="Enter" && (ev.metaKey||ev.ctrlKey)) handleAdd(); };
 
   const allEntries = [...(log||[])].sort((a,b)=>{
-    const ta = a.timestamp || (a.date+"T00:00:00Z");
-    const tb = b.timestamp || (b.date+"T00:00:00Z");
+    const ta = a.timestamp||(a.date+"T00:00:00Z");
+    const tb = b.timestamp||(b.date+"T00:00:00Z");
     return tb.localeCompare(ta);
   });
 
-  const visible = filter==="all" ? allEntries
-    : filter==="notes"   ? allEntries.filter(e=>e.type==="note")
-    : allEntries.filter(e=>e.type==="change");
+  const visible = filter==="all"     ? allEntries
+    : filter==="notes"   ? allEntries.filter(x=>x.type==="note")
+    : allEntries.filter(x=>x.type==="change");
 
-  const noteCount   = allEntries.filter(e=>e.type==="note").length;
-  const changeCount = allEntries.filter(e=>e.type==="change").length;
+  const noteCount   = allEntries.filter(x=>x.type==="note").length;
+  const changeCount = allEntries.filter(x=>x.type==="change").length;
 
-  const tabStyle = (active) => ({
-    fontSize:11, fontWeight:700, padding:"4px 11px", borderRadius:5, cursor:"pointer",
-    border:"none", letterSpacing:"0.05em", textTransform:"uppercase",
-    background: active ? T.blue : "none",
-    color:      active ? "#fff" : T.textMuted,
-    transition: "background 0.15s, color 0.15s",
+  // Flatten change entries into individual diff rows for the ledger
+  const ledgerRows = [];
+  visible.forEach(entry => {
+    if (entry.type==="note") {
+      ledgerRows.push({ entry, kind:"note", label:entry.note, field:"—", from:"—", to:"—" });
+    } else if (entry.type==="change") {
+      (entry.changes||[]).forEach((c,ci) => {
+        ledgerRows.push({ entry, kind:"change", rowIdx:ci, label:"", field:c.field, from:c.from, to:c.to });
+      });
+    }
   });
 
-  return (
-    <div style={{ marginTop:24 }}>
+  const colW = "90px 60px 130px minmax(0,1fr) 100px 100px 28px";
 
-      {/* ── header row ── */}
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+  const thStyle = {
+    fontSize:10, fontWeight:700, color:T.textMuted,
+    textTransform:"uppercase", letterSpacing:"0.08em",
+    padding:"6px 8px", background:T.sidebar,
+    borderBottom:`1px solid ${T.borderStrong}`,
+    whiteSpace:"nowrap", userSelect:"none",
+  };
+
+  const tabBtn = (v, lbl) => (
+    <button key={v} onClick={()=>setFilter(v)} style={{
+      fontSize:10, fontWeight:600, padding:"3px 10px", borderRadius:4, cursor:"pointer",
+      border:"none", letterSpacing:"0.05em", textTransform:"uppercase",
+      background: filter===v ? T.blue : "transparent",
+      color:      filter===v ? "#fff" : T.textMuted,
+    }}>{lbl}</button>
+  );
+
+  const canAdd = note.trim() && date;
+
+  return (
+    <div style={{ marginTop:22 }}>
+
+      {/* ── section header ── */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:7 }}>
           <span style={{ fontSize:11, fontWeight:700, color:T.textSec, textTransform:"uppercase", letterSpacing:"0.08em" }}>History &amp; Activity</span>
-          <span style={{ fontSize:10, fontWeight:700, color:T.blue, background:T.blueLight, padding:"1px 7px", borderRadius:10 }}>{allEntries.length}</span>
+          <span style={{ fontSize:10, fontWeight:700, color:T.blue, background:T.blueLight, padding:"1px 6px", borderRadius:8, lineHeight:1.6 }}>{allEntries.length}</span>
         </div>
-        {/* filter tabs */}
-        <div style={{ display:"flex", gap:3, background:T.bg, borderRadius:7, padding:3, border:`1px solid ${T.border}` }}>
-          {[["all","All"],["notes",`Notes ${noteCount}`],["changes",`Changes ${changeCount}`]].map(([v,lbl])=>(
-            <button key={v} onClick={()=>setFilter(v)} style={tabStyle(filter===v)}>{lbl}</button>
-          ))}
+        <div style={{ display:"flex", gap:2, background:T.bg, borderRadius:5, padding:2, border:`1px solid ${T.border}` }}>
+          {tabBtn("all", "All")}
+          {tabBtn("notes", `Notes ${noteCount}`)}
+          {tabBtn("changes", `Changes ${changeCount}`)}
         </div>
       </div>
 
-      {/* ── scrollable timeline ── */}
-      <div ref={scrollRef} style={{
-        maxHeight:260, overflowY:"auto", borderRadius:9,
-        border:`1px solid ${T.border}`, background:T.bg, marginBottom:12,
-        position:"relative",
-      }}>
-        {visible.length === 0
-          ? <div style={{ padding:"32px 0", textAlign:"center", color:T.textMuted, fontSize:12 }}>
-              {filter==="all" ? "No history yet. Edit the eTool or add a note below." :
-               filter==="notes" ? "No manual notes yet." : "No auto-recorded changes yet."}
-            </div>
-          : visible.map((entry, idx)=>{
-              const isNote   = entry.type==="note";
-              const isChange = entry.type==="change";
-              const isLast   = idx === visible.length-1;
+      {/* ── ledger table ── */}
+      <div style={{ border:`1px solid ${T.border}`, borderRadius:7, overflow:"hidden", marginBottom:8 }}>
 
-              return (
-                <div key={entry.id}
-                  style={{
-                    display:"flex", gap:0, borderBottom: isLast?"none":`1px solid ${T.border}`,
-                    position:"relative",
-                  }}
-                  onMouseEnter={e=>{ const d=e.currentTarget.querySelector(".del-btn"); if(d) d.style.opacity="1"; }}
-                  onMouseLeave={e=>{ const d=e.currentTarget.querySelector(".del-btn"); if(d) d.style.opacity="0"; }}
-                >
-                  {/* Timeline spine + dot */}
-                  <div style={{ width:36, flexShrink:0, display:"flex", flexDirection:"column", alignItems:"center", paddingTop:14 }}>
-                    <div style={{
-                      width:9, height:9, borderRadius:"50%", flexShrink:0,
-                      background: isNote ? T.blue : T.border,
-                      border: isNote ? `2px solid ${T.blueLight}` : `2px solid ${T.borderStrong}`,
-                      zIndex:1,
-                    }}/>
-                    {!isLast && <div style={{ width:1, flex:1, background:T.border, marginTop:3 }}/>}
-                  </div>
+        {/* Column headers */}
+        <div style={{ display:"grid", gridTemplateColumns:colW, gap:0 }}>
+          {["Date","Type","Field / Note","Detail","From","To",""].map((h,i)=>(
+            <div key={i} style={{ ...thStyle, borderRight: i<6 ? `1px solid ${T.border}` : "none" }}>{h}</div>
+          ))}
+        </div>
 
-                  {/* Content */}
-                  <div style={{ flex:1, padding:"12px 12px 12px 4px", minWidth:0 }}>
+        {/* Rows */}
+        <div ref={tableRef} style={{ maxHeight:200, overflowY:"auto", background:T.surface }}>
+          {ledgerRows.length === 0
+            ? <div style={{ padding:"20px 0", textAlign:"center", color:T.textMuted, fontSize:12, gridColumn:"1/-1" }}>
+                {filter==="all" ? "No history yet." : filter==="notes" ? "No notes yet." : "No changes recorded yet."}
+              </div>
+            : ledgerRows.map((row, idx) => {
+                const isNote = row.kind==="note";
+                const isFirst = idx===0 || ledgerRows[idx-1].entry.id !== row.entry.id;
+                const isLast  = idx===ledgerRows.length-1;
+                const bg = idx%2===0 ? T.surface : T.bg;
 
-                    {/* Top row: type tag + date + delete */}
-                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom: isChange ? 8 : 4 }}>
-                      {/* Type label */}
-                      {isNote
-                        ? <span style={{ fontSize:10, fontWeight:600, color:T.blue, background:T.blueLight, padding:"2px 7px", borderRadius:3, textTransform:"uppercase", letterSpacing:"0.07em", flexShrink:0 }}>Note</span>
-                        : <span style={{ fontSize:10, fontWeight:600, color:T.textMuted, background:"#ebebeb", padding:"2px 7px", borderRadius:3, textTransform:"uppercase", letterSpacing:"0.07em", flexShrink:0 }}>Auto</span>
-                      }
-                      <span style={{ fontSize:11, color:T.textMuted, fontFamily:"monospace", letterSpacing:"0.04em" }}>{entry.date}</span>
-                      <div style={{ flex:1 }}/>
-                      {/* Only manual notes can be deleted */}
-                      {isNote && (
-                        <button className="del-btn" onClick={()=>onDeleteEntry(entry.id)}
-                          style={{ opacity:0, background:"none", border:"none", color:T.textMuted, cursor:"pointer", fontSize:14, lineHeight:1, padding:"2px 5px", borderRadius:4, transition:"opacity 0.15s", flexShrink:0 }}>×</button>
+                return (
+                  <div key={`${row.entry.id}-${row.rowIdx??0}`}
+                    style={{ display:"grid", gridTemplateColumns:colW, gap:0,
+                      borderBottom: isLast ? "none" : `1px solid ${T.border}`,
+                      background:bg,
+                    }}
+                    onMouseEnter={ev=>{ ev.currentTarget.style.background="#efefef"; const d=ev.currentTarget.querySelector(".del-btn"); if(d) d.style.opacity="1"; }}
+                    onMouseLeave={ev=>{ ev.currentTarget.style.background=bg; const d=ev.currentTarget.querySelector(".del-btn"); if(d) d.style.opacity="0"; }}
+                  >
+                    {/* Date — only show on first row of each entry */}
+                    <div style={{ padding:"6px 8px", fontSize:11, color:T.textMuted, fontFamily:"monospace", borderRight:`1px solid ${T.border}`, whiteSpace:"nowrap", alignSelf:"center" }}>
+                      {isFirst ? row.entry.date : ""}
+                    </div>
+
+                    {/* Type badge */}
+                    <div style={{ padding:"6px 8px", borderRight:`1px solid ${T.border}`, alignSelf:"center" }}>
+                      {isFirst && (isNote
+                        ? <span style={{ fontSize:9, fontWeight:700, color:T.blue, background:T.blueLight, padding:"2px 6px", borderRadius:3, textTransform:"uppercase", letterSpacing:"0.07em" }}>Note</span>
+                        : <span style={{ fontSize:9, fontWeight:700, color:T.textMuted, background:"#ebebeb", padding:"2px 6px", borderRadius:3, textTransform:"uppercase", letterSpacing:"0.07em" }}>Auto</span>
                       )}
                     </div>
 
-                    {/* Body */}
-                    {isNote && (
-                      <div style={{ fontSize:13, color:T.text, lineHeight:1.6 }}>{entry.note}</div>
-                    )}
-                    {isChange && entry.changes?.map((c,ci)=>(
-                      <FieldChangePill key={ci} field={c.field} from={c.from} to={c.to}/>
-                    ))}
+                    {/* Field / Note text */}
+                    <div style={{ padding:"6px 8px", fontSize:12, color: isNote ? T.text : T.textSec, fontWeight: isNote ? 400 : 500, borderRight:`1px solid ${T.border}`, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", alignSelf:"center" }}>
+                      {isNote ? row.label : row.field}
+                    </div>
+
+                    {/* Detail (note full text in tooltip, empty for changes) */}
+                    <div style={{ padding:"6px 8px", fontSize:12, color:T.textMuted, borderRight:`1px solid ${T.border}`, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", alignSelf:"center" }}
+                      title={isNote ? row.label : ""}>
+                      {isNote ? row.label : ""}
+                    </div>
+
+                    {/* From */}
+                    <div style={{ padding:"6px 8px", fontSize:11, color:"#8a9aaa", borderRight:`1px solid ${T.border}`, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", alignSelf:"center",
+                      textDecoration: !isNote ? "line-through" : "none" }}>
+                      {isNote ? "" : row.from}
+                    </div>
+
+                    {/* To */}
+                    <div style={{ padding:"6px 8px", fontSize:11, fontWeight: !isNote ? 600 : 400, color: !isNote ? T.blue : T.textMuted, borderRight:`1px solid ${T.border}`, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", alignSelf:"center" }}>
+                      {isNote ? "" : row.to}
+                    </div>
+
+                    {/* Delete — notes only */}
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      {isNote && isFirst && (
+                        <button className="del-btn"
+                          onClick={()=>onDeleteEntry(row.entry.id)}
+                          style={{ opacity:0, background:"none", border:"none", color:T.textMuted, cursor:"pointer", fontSize:13, padding:"2px 4px", borderRadius:3, transition:"opacity 0.12s", lineHeight:1 }}>×</button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })
-        }
+                );
+              })
+          }
+        </div>
       </div>
 
-      {/* ── add note form ── */}
-      <div style={{ background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:9, padding:"10px 12px" }}>
-        <div style={{ fontSize:10, fontWeight:700, color:T.textMuted, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Add Note</div>
-        <div style={{ display:"flex", gap:8, alignItems:"flex-start" }}>
-          <input type="date" value={date} onChange={e=>setDate(e.target.value)}
-            style={{ flexShrink:0, width:138, background:T.bg, border:`1.5px solid ${T.border}`, borderRadius:6, color:T.text, fontSize:12, padding:"7px 9px", outline:"none", fontFamily:"inherit" }}
-            onFocus={e=>e.target.style.borderColor=T.blue} onBlur={e=>e.target.style.borderColor=T.border}/>
-          <textarea value={note} onChange={e=>setNote(e.target.value)} onKeyDown={handleKey}
-            placeholder="Enter a note… (Ctrl+Enter to submit)" rows={2}
-            style={{ flex:1, background:T.bg, border:`1.5px solid ${T.border}`, borderRadius:6, color:T.text, fontSize:13, padding:"7px 10px", outline:"none", resize:"none", fontFamily:"inherit", lineHeight:1.5 }}
-            onFocus={e=>e.target.style.borderColor=T.blue} onBlur={e=>e.target.style.borderColor=T.border}/>
-          <button onClick={handleAdd} disabled={!note.trim()||!date}
-            style={{ flexShrink:0, background:note.trim()&&date?T.blue:"#c8d5f0", border:"none", borderRadius:6, color:"#fff", fontSize:12, fontWeight:700, padding:"8px 14px", cursor:note.trim()&&date?"pointer":"default", alignSelf:"stretch", transition:"background 0.15s" }}>
-            Add
-          </button>
-        </div>
-        <div style={{ marginTop:6, fontSize:11, color:T.textMuted }}>Manual notes are blue · Auto-recorded changes are gray · Ctrl+Enter to submit</div>
+      {/* ── compact add-note row ── */}
+      <div style={{ display:"flex", gap:6, alignItems:"center", background:T.surface, border:`1px solid ${T.border}`, borderRadius:6, padding:"5px 8px" }}>
+        <input type="date" value={date} onChange={ev=>setDate(ev.target.value)}
+          style={{ flexShrink:0, width:126, background:"transparent", border:"none", color:T.text, fontSize:12, padding:"4px 4px", outline:"none", fontFamily:"inherit" }}
+          onFocus={ev=>ev.target.style.background=T.bg} onBlur={ev=>ev.target.style.background="transparent"}/>
+        <div style={{ width:1, height:20, background:T.border, flexShrink:0 }}/>
+        <input
+          value={note} onChange={ev=>setNote(ev.target.value)} onKeyDown={handleKey}
+          placeholder="Add a note… (Enter to submit)"
+          style={{ flex:1, background:"transparent", border:"none", color:T.text, fontSize:12, padding:"4px 6px", outline:"none", fontFamily:"inherit" }}
+        />
+        <button onClick={handleAdd} disabled={!canAdd}
+          style={{ flexShrink:0, background: canAdd ? T.blue : T.border, border:"none", borderRadius:4,
+            color: canAdd ? "#fff" : T.textMuted, fontSize:11, fontWeight:600, padding:"5px 12px",
+            cursor: canAdd ? "pointer" : "default", transition:"background 0.15s", whiteSpace:"nowrap" }}>
+          + Add
+        </button>
       </div>
+
     </div>
   );
 }
@@ -1111,6 +1127,7 @@ export default function App() {
             </div>
             <span style={{ fontSize:14, fontWeight:700, color:T.text, letterSpacing:"-0.02em" }}>eTool Manager</span>
             <span style={{ fontSize:10, color:T.textMuted, background:"transparent", borderLeft:`2px solid ${T.border}`, paddingLeft:10, letterSpacing:"0.12em", fontWeight:500 }}>ENGINEERING</span>
+            <span style={{ fontSize:10, fontFamily:"monospace", color:T.textMuted, background:T.bg, border:`1px solid ${T.border}`, borderRadius:3, padding:"2px 6px", letterSpacing:"0.08em" }}>{BUILD}</span>
           </div>
           <button onClick={()=>setCreating(true)} style={{ background:T.blue, border:`1px solid ${T.blue}`, borderRadius:5, color:"#fff", fontSize:12, fontWeight:600, padding:"7px 16px", cursor:"pointer", letterSpacing:"0.04em" }}>+ New eTool</button>
         </div>
