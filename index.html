@@ -46,49 +46,45 @@
   </style>
 </head>
 <body>
+
   <div id="loading">
     <div class="ld-mark"><span></span><span></span><span></span><span></span></div>
     <div class="ld-text">Loading eTool Manager</div>
   </div>
+
   <div id="root"></div>
+
   <!--
-  ┌──────────────────────────────────────────────────┐
-  │  eTool Manager v20260519-ca785a8                │
-  │  → GitHub Pages : push index.html, enable Pages         │
-  │  → Netlify/Vercel: drag and drop                        │
-  │  → Local         : open index.html directly in browser  │
-  └──────────────────────────────────────────────────┘
+    DEPLOYMENT NOTE
+    This file is fully self-contained. Push ONLY index.html to GitHub Pages.
+    Do NOT push etool-manager.jsx — it will cause "exports is not defined"
+    errors if the browser loads it as a module.
+
+    Build: v20260519-ca785a8
+    GitHub Pages: Settings > Pages > Source = main branch /root (or /docs)
   -->
+
+  <!-- 1. React 18 UMD — must load before the app script below -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- 2. App — pre-compiled plain JS, wrapped in IIFE, sets window.App -->
   <script>
-/* eTool Manager v20260519-ca785a8 */
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
-function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
-function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
-function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-function _createForOfIteratorHelper(r, e) { var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (!t) { if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t.return || t.return(); } finally { if (u) throw o; } } }; }
-function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
-function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
-var _React = React,
-  useState = _React.useState,
-  useMemo = _React.useMemo,
-  useRef = _React.useRef,
-  useEffect = _React.useEffect;
-var BUILD = "ca785a8";
+/* eTool Manager v20260519-ca785a8 — pre-compiled via Babel, do not edit */
+(function(React, ReactDOM) {
+  "use strict";
+  // Expose App to global scope for mount script
+  var _appExport;
+const {
+  useState,
+  useMemo,
+  useRef,
+  useEffect
+} = React;
+const BUILD = "ca785a8";
 
 // Charcoal #36454f · Slate Gray #708090 · Light Gray #d3d3d3 · White #ffffff
-var T = {
+const T = {
   // backgrounds
   bg: "#f5f5f5",
   // near-white page bg
@@ -127,7 +123,7 @@ var T = {
   // muted dark amber
   warningLight: "#f5f0e8"
 };
-var STATUSES = {
+const STATUSES = {
   Draft: {
     color: T.textMuted,
     bg: "#efefef"
@@ -153,7 +149,7 @@ var STATUSES = {
     bg: T.dangerLight
   }
 };
-var PRIORITIES = {
+const PRIORITIES = {
   Critical: {
     color: T.danger,
     bg: T.dangerLight
@@ -171,14 +167,14 @@ var PRIORITIES = {
     bg: "#efefef"
   }
 };
-var PHASES = ["Design", "Procurement", "Build"];
-var PORD = {
+const PHASES = ["Design", "Procurement", "Build"];
+const PORD = {
   Critical: 0,
   High: 1,
   Medium: 2,
   Low: 3
 };
-var SORD = {
+const SORD = {
   "In Build": 0,
   "In Design": 1,
   Procurement: 2,
@@ -187,18 +183,18 @@ var SORD = {
   Complete: 5
 };
 function daysAgoDate(n) {
-  var x = new Date();
+  const x = new Date();
   x.setDate(x.getDate() - n);
   return x.toISOString().slice(0, 10);
 }
 function ri(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
-var REQUESTERS = ["J. Hartmann", "L. Park", "A. Singh", "R. Chen", "M. Torres", "K. Novak", "S. Osei", "T. Wren", "D. Farouk", "P. Ito", "N. Reyes", "C. Mueller", "B. Adeyemi", "F. Larsson", "G. Kowalski"];
-var PARTS_DATA = [["Titanium Mounting Bracket", "Ti-6Al-4V", "Aerospace hinge bracket for wing-flap assembly. Precision machined to ±0.002mm tolerance."], ["Hydraulic Manifold Block", "6061-T6 Aluminum", "5-port custom manifold rated 5000 PSI. Requires hard-anodize finish and pressure certification."], ["Carbon Fiber Chassis Panel", "T700 CFRP", "3mm unidirectional layup for chassis reinforcement. Autoclave cure and NDI inspection required."], ["Stainless Valve Housing", "316L Stainless", "CNC-turned valve body with 1/4-NPT ports. FDA-grade electropolish finish required."], ["Composite Bulkhead Rib", "Carbon/Epoxy", "Structural rib for fuselage frame section. Post-cure NDI and load test required."], ["Aluminum Heat Sink", "6063 Aluminum", "Extruded heat sink for 200W power module. 2mm fin pitch, black anodize."], ["Inconel Turbine Vane", "Inconel 718", "High-temp vane operating at 900°C. EDM finishing and fluorescent penetrant inspection required."], ["Titanium Fastener Kit", "Ti-3Al-2.5V", "Custom hex-head M8×1.25 fasteners for structural joints. Lot traceability required."], ["PEEK Bearing Cage", "PEEK Polymer", "30mm OD bearing cage, chemical-resistant, for aggressive-media pump assembly."], ["Steel Spline Shaft", "4340 Steel", "Precision spline shaft hardened to 58HRC for gearbox interface. Profile ground finish."], ["Beryllium Copper Spring", "BeCu C17200", "Miniature leaf spring 0.15mm thickness for high-cycle microswitch assembly."], ["Magnesium Gearbox Cover", "AZ91D Magnesium", "Die-cast cover for weight-critical application. Chromate coat per MIL-DTL-5541."], ["UHMWPE Slide Rail", "UHMWPE", "Self-lubricating 600mm slide rail for linear actuator, zero-maintenance design."], ["Brass Electrical Terminal", "C360 Brass", "50A rated crimp terminal block with gold-plated contact surface, UL listed."], ["Hastelloy Reactor Vessel", "Hastelloy C-276", "Corrosion-resistant 2L vessel rated 150 PSI MAWP for aggressive chemical service."], ["Aluminum Extrusion Frame", "6082 Aluminum", "80×80mm T-slot extrusion frame for modular equipment enclosure system."], ["Nylon 12 Fluid Fitting", "Nylon 12 PA", "Push-to-connect 8mm OD tube fitting, 10 bar rated, FDA-compliant material."], ["Tungsten Carbide Insert", "WC-Co Grade", "Indexable carbide insert for high-speed machining fixture toolholder."], ["Silicon Bronze Bushing", "SiB C65500", "50mm bore worm-gear bushing, self-lubricated for marine saltwater service."], ["Tool Steel Die Block", "D2 Tool Steel", "200×150×80mm stamping die block, vacuum heat-treated to 60HRC."], ["Copper Induction Coil", "ETP Copper", "3-turn induction heating coil, 40mm ID, water-cooled, custom formed to spec."], ["Polycarbonate Window Panel", "Lexan 9034", "8mm impact-resistant UV-stabilized window panel for enclosure sight glass."], ["Fiberglass Insulating Board", "FR4 G10", "Structural insulating board for high-voltage switchgear, UL94 V-0 rated."], ["Nitinol Actuator Wire", "Ni-Ti SE508", "0.5mm shape-memory alloy wire for microactuator mechanism, pre-trained."], ["Ceramic Bearing Race", "Si3N4 Ceramic", "Full-ceramic bearing inner race, Grade 5 tolerance, for cryogenic pump."], ["Kovar Hermetic Seal", "Kovar F-15", "20-pin glass-to-metal hermetic feedthrough for vacuum sensor housing."], ["Graphite Electrode Block", "Isostatic Graphite", "100×100×80mm fine-grain EDM electrode blank for die-sinking application."], ["Acetal Gear Blank", "Delrin 500P", "Module 2, 80T spur gear blank for low-load conveyor drive, food-grade."], ["Invar Optical Mount", "Invar 36", "Low-CTE precision optical bench mount for laser alignment system."], ["Monel Pump Impeller", "Monel 400", "5-blade 120mm diameter marine pump impeller for aggressive seawater service."]];
+const REQUESTERS = ["J. Hartmann", "L. Park", "A. Singh", "R. Chen", "M. Torres", "K. Novak", "S. Osei", "T. Wren", "D. Farouk", "P. Ito", "N. Reyes", "C. Mueller", "B. Adeyemi", "F. Larsson", "G. Kowalski"];
+const PARTS_DATA = [["Titanium Mounting Bracket", "Ti-6Al-4V", "Aerospace hinge bracket for wing-flap assembly. Precision machined to ±0.002mm tolerance."], ["Hydraulic Manifold Block", "6061-T6 Aluminum", "5-port custom manifold rated 5000 PSI. Requires hard-anodize finish and pressure certification."], ["Carbon Fiber Chassis Panel", "T700 CFRP", "3mm unidirectional layup for chassis reinforcement. Autoclave cure and NDI inspection required."], ["Stainless Valve Housing", "316L Stainless", "CNC-turned valve body with 1/4-NPT ports. FDA-grade electropolish finish required."], ["Composite Bulkhead Rib", "Carbon/Epoxy", "Structural rib for fuselage frame section. Post-cure NDI and load test required."], ["Aluminum Heat Sink", "6063 Aluminum", "Extruded heat sink for 200W power module. 2mm fin pitch, black anodize."], ["Inconel Turbine Vane", "Inconel 718", "High-temp vane operating at 900°C. EDM finishing and fluorescent penetrant inspection required."], ["Titanium Fastener Kit", "Ti-3Al-2.5V", "Custom hex-head M8×1.25 fasteners for structural joints. Lot traceability required."], ["PEEK Bearing Cage", "PEEK Polymer", "30mm OD bearing cage, chemical-resistant, for aggressive-media pump assembly."], ["Steel Spline Shaft", "4340 Steel", "Precision spline shaft hardened to 58HRC for gearbox interface. Profile ground finish."], ["Beryllium Copper Spring", "BeCu C17200", "Miniature leaf spring 0.15mm thickness for high-cycle microswitch assembly."], ["Magnesium Gearbox Cover", "AZ91D Magnesium", "Die-cast cover for weight-critical application. Chromate coat per MIL-DTL-5541."], ["UHMWPE Slide Rail", "UHMWPE", "Self-lubricating 600mm slide rail for linear actuator, zero-maintenance design."], ["Brass Electrical Terminal", "C360 Brass", "50A rated crimp terminal block with gold-plated contact surface, UL listed."], ["Hastelloy Reactor Vessel", "Hastelloy C-276", "Corrosion-resistant 2L vessel rated 150 PSI MAWP for aggressive chemical service."], ["Aluminum Extrusion Frame", "6082 Aluminum", "80×80mm T-slot extrusion frame for modular equipment enclosure system."], ["Nylon 12 Fluid Fitting", "Nylon 12 PA", "Push-to-connect 8mm OD tube fitting, 10 bar rated, FDA-compliant material."], ["Tungsten Carbide Insert", "WC-Co Grade", "Indexable carbide insert for high-speed machining fixture toolholder."], ["Silicon Bronze Bushing", "SiB C65500", "50mm bore worm-gear bushing, self-lubricated for marine saltwater service."], ["Tool Steel Die Block", "D2 Tool Steel", "200×150×80mm stamping die block, vacuum heat-treated to 60HRC."], ["Copper Induction Coil", "ETP Copper", "3-turn induction heating coil, 40mm ID, water-cooled, custom formed to spec."], ["Polycarbonate Window Panel", "Lexan 9034", "8mm impact-resistant UV-stabilized window panel for enclosure sight glass."], ["Fiberglass Insulating Board", "FR4 G10", "Structural insulating board for high-voltage switchgear, UL94 V-0 rated."], ["Nitinol Actuator Wire", "Ni-Ti SE508", "0.5mm shape-memory alloy wire for microactuator mechanism, pre-trained."], ["Ceramic Bearing Race", "Si3N4 Ceramic", "Full-ceramic bearing inner race, Grade 5 tolerance, for cryogenic pump."], ["Kovar Hermetic Seal", "Kovar F-15", "20-pin glass-to-metal hermetic feedthrough for vacuum sensor housing."], ["Graphite Electrode Block", "Isostatic Graphite", "100×100×80mm fine-grain EDM electrode blank for die-sinking application."], ["Acetal Gear Blank", "Delrin 500P", "Module 2, 80T spur gear blank for low-load conveyor drive, food-grade."], ["Invar Optical Mount", "Invar 36", "Low-CTE precision optical bench mount for laser alignment system."], ["Monel Pump Impeller", "Monel 400", "5-blade 120mm diameter marine pump impeller for aggressive seawater service."]];
 function mkPhase(complete, daysOff) {
   return {
-    complete: complete,
+    complete,
     notes: complete ? ri(["Approved and signed off.", "Drawings verified.", "PO issued, lead time 6wk.", "Fabrication complete. QC passed.", "Received and inspected.", "Cure cycle complete."]) : "",
     assignee: complete ? ri(REQUESTERS) : "",
     dueDate: daysAgoDate(daysOff)
@@ -206,7 +202,7 @@ function mkPhase(complete, daysOff) {
 }
 
 // ── diff engine ───────────────────────────────────────────────────────────────
-var TRACKED_FIELDS = [{
+const TRACKED_FIELDS = [{
   key: "title",
   label: "Title"
 }, {
@@ -226,70 +222,52 @@ var TRACKED_FIELDS = [{
   label: "Part Number"
 }];
 function diffEtool(prev, next) {
-  var changes = [];
-  var _iterator = _createForOfIteratorHelper(TRACKED_FIELDS),
-    _step;
-  try {
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var _step$value = _step.value,
-        key = _step$value.key,
-        label = _step$value.label;
-      if (prev[key] !== next[key]) {
-        changes.push({
-          field: label,
-          from: prev[key] || "—",
-          to: next[key] || "—"
-        });
-      }
+  const changes = [];
+  for (const {
+    key,
+    label
+  } of TRACKED_FIELDS) {
+    if (prev[key] !== next[key]) {
+      changes.push({
+        field: label,
+        from: prev[key] || "—",
+        to: next[key] || "—"
+      });
     }
-    // phase completion diffs
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
   }
-  var _iterator2 = _createForOfIteratorHelper(PHASES),
-    _step2;
-  try {
-    for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-      var _prev$phases, _next$phases;
-      var ph = _step2.value;
-      var pPrev = (_prev$phases = prev.phases) === null || _prev$phases === void 0 ? void 0 : _prev$phases[ph];
-      var pNext = (_next$phases = next.phases) === null || _next$phases === void 0 ? void 0 : _next$phases[ph];
-      if ((pPrev === null || pPrev === void 0 ? void 0 : pPrev.complete) !== (pNext === null || pNext === void 0 ? void 0 : pNext.complete)) {
-        changes.push({
-          field: "".concat(ph, " phase"),
-          from: pPrev !== null && pPrev !== void 0 && pPrev.complete ? "Complete" : "Pending",
-          to: pNext !== null && pNext !== void 0 && pNext.complete ? "Complete" : "Pending"
-        });
-      }
+  // phase completion diffs
+  for (const ph of PHASES) {
+    const pPrev = prev.phases?.[ph];
+    const pNext = next.phases?.[ph];
+    if (pPrev?.complete !== pNext?.complete) {
+      changes.push({
+        field: `${ph} phase`,
+        from: pPrev?.complete ? "Complete" : "Pending",
+        to: pNext?.complete ? "Complete" : "Pending"
+      });
     }
-  } catch (err) {
-    _iterator2.e(err);
-  } finally {
-    _iterator2.f();
   }
   return changes;
 }
 function makeChangeEntry(changes) {
   return {
-    id: "chg-".concat(Date.now(), "-").concat(Math.random().toString(36).slice(2, 6)),
+    id: `chg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     type: "change",
     date: new Date().toISOString().slice(0, 10),
     timestamp: new Date().toISOString(),
-    changes: changes
+    changes
   };
 }
-var LOG_NOTES = ["Initial requirements reviewed with stakeholder. Scope confirmed.", "CAD model received from design team. Tolerance review in progress.", "Vendor quotes requested from three suppliers.", "Material certification documents received and filed.", "Design review meeting held. Minor changes requested to edge radii.", "Purchase order submitted to preferred vendor.", "Lead time confirmed at 6 weeks. Expected delivery updated.", "First article inspection scheduled for next week.", "Surface finish changed from as-machined to bead blast per customer request.", "Drawing revision B released. Vendors notified.", "Raw material received and logged into inventory.", "Machining commenced. In-process inspection passed.", "Dimensional report reviewed. All critical features within tolerance.", "Final QC inspection complete. Certificate of conformance issued.", "Part shipped to assembly. Tracking number recorded.", "Awaiting updated delivery schedule from supplier.", "Discussed alternate material option with engineering. Decision pending."];
+const LOG_NOTES = ["Initial requirements reviewed with stakeholder. Scope confirmed.", "CAD model received from design team. Tolerance review in progress.", "Vendor quotes requested from three suppliers.", "Material certification documents received and filed.", "Design review meeting held. Minor changes requested to edge radii.", "Purchase order submitted to preferred vendor.", "Lead time confirmed at 6 weeks. Expected delivery updated.", "First article inspection scheduled for next week.", "Surface finish changed from as-machined to bead blast per customer request.", "Drawing revision B released. Vendors notified.", "Raw material received and logged into inventory.", "Machining commenced. In-process inspection passed.", "Dimensional report reviewed. All critical features within tolerance.", "Final QC inspection complete. Certificate of conformance issued.", "Part shipped to assembly. Tracking number recorded.", "Awaiting updated delivery schedule from supplier.", "Discussed alternate material option with engineering. Decision pending."];
 
 // Seeded status progressions to simulate realistic change history
-var STATUS_PROGRESSIONS = [["Draft", "In Design"], ["Draft", "In Design", "Procurement"], ["Draft", "In Design", "Procurement", "In Build"], ["Draft", "In Design", "Procurement", "In Build", "Complete"], ["In Design", "On Hold"], ["Procurement", "On Hold"]];
+const STATUS_PROGRESSIONS = [["Draft", "In Design"], ["Draft", "In Design", "Procurement"], ["Draft", "In Design", "Procurement", "In Build"], ["Draft", "In Design", "Procurement", "In Build", "Complete"], ["In Design", "On Hold"], ["Procurement", "On Hold"]];
 function seedLogs(ago, finalStatus) {
-  var entries = [];
+  const entries = [];
 
   // 1. Seed "created" entry
   entries.push({
-    id: "chg-seed-created-".concat(Math.random().toString(36).slice(2)),
+    id: `chg-seed-created-${Math.random().toString(36).slice(2)}`,
     type: "change",
     date: daysAgoDate(ago),
     timestamp: daysAgoDate(ago) + "T09:00:00Z",
@@ -301,17 +279,15 @@ function seedLogs(ago, finalStatus) {
   });
 
   // 2. Seed status-change events based on final status
-  var progressions = STATUS_PROGRESSIONS.filter(function (p) {
-    return p[p.length - 1] === finalStatus;
-  });
-  var progression = progressions.length ? ri(progressions) : null;
+  const progressions = STATUS_PROGRESSIONS.filter(p => p[p.length - 1] === finalStatus);
+  const progression = progressions.length ? ri(progressions) : null;
   if (progression && progression.length > 1) {
-    var stepGap = Math.floor((ago - 3) / progression.length);
-    for (var s = 1; s < progression.length; s++) {
-      var stepAgo = ago - s * stepGap;
+    const stepGap = Math.floor((ago - 3) / progression.length);
+    for (let s = 1; s < progression.length; s++) {
+      const stepAgo = ago - s * stepGap;
       if (stepAgo > 1) {
         entries.push({
-          id: "chg-seed-st-".concat(s, "-").concat(Math.random().toString(36).slice(2)),
+          id: `chg-seed-st-${s}-${Math.random().toString(36).slice(2)}`,
           type: "change",
           date: daysAgoDate(stepAgo),
           timestamp: daysAgoDate(stepAgo) + "T10:00:00Z",
@@ -326,41 +302,35 @@ function seedLogs(ago, finalStatus) {
   }
 
   // 3. Seed some manual notes
-  var noteCount = ri([0, 1, 1, 2, 2, 3]);
-  for (var k = 0; k < noteCount; k++) {
-    var dOffset = Math.floor(Math.random() * (ago - 5)) + 2;
+  const noteCount = ri([0, 1, 1, 2, 2, 3]);
+  for (let k = 0; k < noteCount; k++) {
+    const dOffset = Math.floor(Math.random() * (ago - 5)) + 2;
     entries.push({
-      id: "log-seed-".concat(Math.random().toString(36).slice(2)),
+      id: `log-seed-${Math.random().toString(36).slice(2)}`,
       type: "note",
       date: daysAgoDate(dOffset),
       timestamp: daysAgoDate(dOffset) + "T14:00:00Z",
       note: ri(LOG_NOTES)
     });
   }
-  return entries.sort(function (a, b) {
-    return b.timestamp.localeCompare(a.timestamp);
-  });
+  return entries.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
 }
-var ETOOL_DATA = PARTS_DATA.map(function (_ref, i) {
-  var _ref2 = _slicedToArray(_ref, 3),
-    title = _ref2[0],
-    material = _ref2[1],
-    description = _ref2[2];
-  var ago = Math.floor(Math.random() * 690) + 15;
-  var status = ri(["Draft", "In Design", "In Design", "Procurement", "Procurement", "In Build", "Complete", "Complete", "On Hold"]);
-  var priority = ri(["Critical", "Critical", "High", "High", "High", "Medium", "Medium", "Medium", "Low"]);
-  var dDone = ["Complete", "In Build", "Procurement"].includes(status);
-  var pDone = ["Complete", "In Build"].includes(status);
-  var bDone = status === "Complete";
+const ETOOL_DATA = PARTS_DATA.map(([title, material, description], i) => {
+  const ago = Math.floor(Math.random() * 690) + 15;
+  const status = ri(["Draft", "In Design", "In Design", "Procurement", "Procurement", "In Build", "Complete", "Complete", "On Hold"]);
+  const priority = ri(["Critical", "Critical", "High", "High", "High", "Medium", "Medium", "Medium", "Low"]);
+  const dDone = ["Complete", "In Build", "Procurement"].includes(status);
+  const pDone = ["Complete", "In Build"].includes(status);
+  const bDone = status === "Complete";
   return {
-    id: "ET-".concat(String(i + 1).padStart(3, "0")),
-    title: title,
-    material: material,
-    description: description,
-    status: status,
-    priority: priority,
+    id: `ET-${String(i + 1).padStart(3, "0")}`,
+    title,
+    material,
+    description,
+    status,
+    priority,
     requester: ri(REQUESTERS),
-    partNumber: "".concat(material.replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase(), "-").concat(String(1000 + i * 41).slice(1)),
+    partNumber: `${material.replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase()}-${String(1000 + i * 41).slice(1)}`,
     created: daysAgoDate(ago),
     log: seedLogs(ago, status),
     phases: {
@@ -370,45 +340,41 @@ var ETOOL_DATA = PARTS_DATA.map(function (_ref, i) {
     }
   };
 });
-var defPhases = function defPhases() {
-  return {
-    Design: {
-      complete: false,
-      notes: "",
-      assignee: "",
-      dueDate: ""
-    },
-    Procurement: {
-      complete: false,
-      notes: "",
-      assignee: "",
-      dueDate: ""
-    },
-    Build: {
-      complete: false,
-      notes: "",
-      assignee: "",
-      dueDate: ""
-    }
-  };
-};
-var emptyForm = function emptyForm() {
-  return {
-    title: "",
-    description: "",
-    status: "Draft",
-    priority: "Medium",
-    requester: "",
-    partNumber: "",
-    material: "",
-    log: [],
-    phases: defPhases()
-  };
-};
-var inputStyle = {
+const defPhases = () => ({
+  Design: {
+    complete: false,
+    notes: "",
+    assignee: "",
+    dueDate: ""
+  },
+  Procurement: {
+    complete: false,
+    notes: "",
+    assignee: "",
+    dueDate: ""
+  },
+  Build: {
+    complete: false,
+    notes: "",
+    assignee: "",
+    dueDate: ""
+  }
+});
+const emptyForm = () => ({
+  title: "",
+  description: "",
+  status: "Draft",
+  priority: "Medium",
+  requester: "",
+  partNumber: "",
+  material: "",
+  log: [],
+  phases: defPhases()
+});
+const inputStyle = {
   width: "100%",
   background: T.bg,
-  border: "1px solid ".concat(T.border),
+  border: `1px solid ${T.border}`,
   borderRadius: 5,
   color: T.text,
   fontSize: 13,
@@ -419,10 +385,11 @@ var inputStyle = {
 };
 
 // ── tiny helpers ──────────────────────────────────────────────────────────────
-function Badge(_ref3) {
-  var s = _ref3.s,
-    small = _ref3.small;
-  var st = STATUSES[s] || STATUSES["Draft"];
+function Badge({
+  s,
+  small
+}) {
+  const st = STATUSES[s] || STATUSES["Draft"];
   return /*#__PURE__*/React.createElement("span", {
     style: {
       fontSize: small ? 10 : 11,
@@ -437,10 +404,11 @@ function Badge(_ref3) {
     }
   }, s);
 }
-function PriBadge(_ref4) {
-  var p = _ref4.p,
-    small = _ref4.small;
-  var pr = PRIORITIES[p] || PRIORITIES["Medium"];
+function PriBadge({
+  p,
+  small
+}) {
+  const pr = PRIORITIES[p] || PRIORITIES["Medium"];
   return /*#__PURE__*/React.createElement("span", {
     style: {
       fontSize: small ? 10 : 11,
@@ -455,38 +423,34 @@ function PriBadge(_ref4) {
     }
   }, p);
 }
-function PhaseChips(_ref5) {
-  var phases = _ref5.phases;
+function PhaseChips({
+  phases
+}) {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 4
     }
-  }, PHASES.map(function (p) {
-    var _phases$p, _phases$p2, _phases$p3;
-    return /*#__PURE__*/React.createElement("span", {
-      key: p,
-      style: {
-        fontSize: 10,
-        fontWeight: 700,
-        textTransform: "uppercase",
-        letterSpacing: "0.05em",
-        padding: "2px 6px",
-        borderRadius: 3,
-        background: (_phases$p = phases[p]) !== null && _phases$p !== void 0 && _phases$p.complete ? T.successLight : "#f1f3f7",
-        color: (_phases$p2 = phases[p]) !== null && _phases$p2 !== void 0 && _phases$p2.complete ? T.success : T.textMuted,
-        border: "1px solid ".concat((_phases$p3 = phases[p]) !== null && _phases$p3 !== void 0 && _phases$p3.complete ? "#bbf7d0" : T.border)
-      }
-    }, p[0]);
-  }));
+  }, PHASES.map(p => /*#__PURE__*/React.createElement("span", {
+    key: p,
+    style: {
+      fontSize: 10,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      letterSpacing: "0.05em",
+      padding: "2px 6px",
+      borderRadius: 3,
+      background: phases[p]?.complete ? T.successLight : "#f1f3f7",
+      color: phases[p]?.complete ? T.success : T.textMuted,
+      border: `1px solid ${phases[p]?.complete ? "#bbf7d0" : T.border}`
+    }
+  }, p[0])));
 }
-function ProgBar(_ref6) {
-  var phases = _ref6.phases;
-  var done = PHASES.filter(function (p) {
-    var _phases$p4;
-    return (_phases$p4 = phases[p]) === null || _phases$p4 === void 0 ? void 0 : _phases$p4.complete;
-  }).length;
-  var pct = Math.round(done / PHASES.length * 100);
+function ProgBar({
+  phases
+}) {
+  const done = PHASES.filter(p => phases[p]?.complete).length;
+  const pct = Math.round(done / PHASES.length * 100);
   return /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
@@ -504,7 +468,7 @@ function ProgBar(_ref6) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      width: "".concat(pct, "%"),
+      width: `${pct}%`,
       height: "100%",
       background: pct === 100 ? T.success : T.blue,
       borderRadius: 2
@@ -520,8 +484,9 @@ function ProgBar(_ref6) {
 }
 
 // ── sort arrow SVG ────────────────────────────────────────────────────────────
-function SortArrow(_ref7) {
-  var dir = _ref7.dir;
+function SortArrow({
+  dir
+}) {
   // dir: null | "asc" | "desc"
   if (!dir) return /*#__PURE__*/React.createElement("svg", {
     width: "10",
@@ -565,8 +530,9 @@ function SortArrow(_ref7) {
 }
 
 // ── filter funnel SVG ─────────────────────────────────────────────────────────
-function FunnelIcon(_ref8) {
-  var active = _ref8.active;
+function FunnelIcon({
+  active
+}) {
   return /*#__PURE__*/React.createElement("svg", {
     width: "11",
     height: "11",
@@ -586,37 +552,34 @@ function FunnelIcon(_ref8) {
 
 // ── click-outside hook ────────────────────────────────────────────────────────
 function useOutsideClick(ref, cb) {
-  useEffect(function () {
+  useEffect(() => {
     function h(e) {
       if (ref.current && !ref.current.contains(e.target)) cb();
     }
     document.addEventListener("mousedown", h);
-    return function () {
-      return document.removeEventListener("mousedown", h);
-    };
+    return () => document.removeEventListener("mousedown", h);
   }, [ref, cb]);
 }
 
 // ── ColumnFilterDropdown ──────────────────────────────────────────────────────
-function ColFilterDropdown(_ref9) {
-  var colKey = _ref9.colKey,
-    options = _ref9.options,
-    selected = _ref9.selected,
-    onChange = _ref9.onChange,
-    onClose = _ref9.onClose;
-  var ref = useRef();
+function ColFilterDropdown({
+  colKey,
+  options,
+  selected,
+  onChange,
+  onClose
+}) {
+  const ref = useRef();
   useOutsideClick(ref, onClose);
 
   // options: array of { value, label?, badge? }
-  var allChecked = selected.length === 0;
-  var toggle = function toggle(val) {
+  const allChecked = selected.length === 0;
+  const toggle = val => {
     if (val === "__all__") {
       onChange([]);
       return;
     }
-    var next = selected.includes(val) ? selected.filter(function (x) {
-      return x !== val;
-    }) : [].concat(_toConsumableArray(selected), [val]);
+    const next = selected.includes(val) ? selected.filter(x => x !== val) : [...selected, val];
     onChange(next);
   };
   return /*#__PURE__*/React.createElement("div", {
@@ -627,7 +590,7 @@ function ColFilterDropdown(_ref9) {
       left: 0,
       zIndex: 500,
       background: T.surface,
-      border: "1.5px solid ".concat(T.borderStrong),
+      border: `1.5px solid ${T.borderStrong}`,
       borderRadius: 10,
       padding: "6px 0",
       minWidth: 180,
@@ -635,13 +598,11 @@ function ColFilterDropdown(_ref9) {
       overflowY: "auto",
       boxShadow: "0 8px 28px rgba(0,0,0,0.11)"
     },
-    onClick: function onClick(e) {
-      return e.stopPropagation();
-    }
+    onClick: e => e.stopPropagation()
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "4px 12px 8px",
-      borderBottom: "1px solid ".concat(T.border),
+      borderBottom: `1px solid ${T.border}`,
       marginBottom: 4
     }
   }, /*#__PURE__*/React.createElement("span", {
@@ -653,9 +614,7 @@ function ColFilterDropdown(_ref9) {
       letterSpacing: "0.08em"
     }
   }, "Filter by ", colKey)), /*#__PURE__*/React.createElement("div", {
-    onClick: function onClick() {
-      return toggle("__all__");
-    },
+    onClick: () => toggle("__all__"),
     style: {
       display: "flex",
       alignItems: "center",
@@ -664,10 +623,10 @@ function ColFilterDropdown(_ref9) {
       cursor: "pointer",
       background: allChecked ? T.blueLight : "transparent"
     },
-    onMouseEnter: function onMouseEnter(e) {
+    onMouseEnter: e => {
       if (!allChecked) e.currentTarget.style.background = T.bg;
     },
-    onMouseLeave: function onMouseLeave(e) {
+    onMouseLeave: e => {
       if (!allChecked) e.currentTarget.style.background = "transparent";
     }
   }, /*#__PURE__*/React.createElement("span", {
@@ -675,7 +634,7 @@ function ColFilterDropdown(_ref9) {
       width: 14,
       height: 14,
       borderRadius: 3,
-      border: "1.5px solid ".concat(allChecked ? T.blue : T.borderStrong),
+      border: `1.5px solid ${allChecked ? T.blue : T.borderStrong}`,
       background: allChecked ? T.blue : "#fff",
       display: "flex",
       alignItems: "center",
@@ -698,13 +657,11 @@ function ColFilterDropdown(_ref9) {
       color: allChecked ? T.blue : T.text,
       fontWeight: allChecked ? 700 : 400
     }
-  }, "All")), options.map(function (opt) {
-    var checked = selected.includes(opt.value);
+  }, "All")), options.map(opt => {
+    const checked = selected.includes(opt.value);
     return /*#__PURE__*/React.createElement("div", {
       key: opt.value,
-      onClick: function onClick() {
-        return toggle(opt.value);
-      },
+      onClick: () => toggle(opt.value),
       style: {
         display: "flex",
         alignItems: "center",
@@ -713,10 +670,10 @@ function ColFilterDropdown(_ref9) {
         cursor: "pointer",
         background: checked ? T.blueLight : "transparent"
       },
-      onMouseEnter: function onMouseEnter(e) {
+      onMouseEnter: e => {
         if (!checked) e.currentTarget.style.background = T.bg;
       },
-      onMouseLeave: function onMouseLeave(e) {
+      onMouseLeave: e => {
         if (!checked) e.currentTarget.style.background = "transparent";
       }
     }, /*#__PURE__*/React.createElement("span", {
@@ -724,7 +681,7 @@ function ColFilterDropdown(_ref9) {
         width: 14,
         height: 14,
         borderRadius: 3,
-        border: "1.5px solid ".concat(checked ? T.blue : T.borderStrong),
+        border: `1.5px solid ${checked ? T.blue : T.borderStrong}`,
         background: checked ? T.blue : "#fff",
         display: "flex",
         alignItems: "center",
@@ -752,26 +709,24 @@ function ColFilterDropdown(_ref9) {
 }
 
 // ── ColumnHeader ──────────────────────────────────────────────────────────────
-function ColHeader(_ref0) {
-  var label = _ref0.label,
-    colKey = _ref0.colKey,
-    sortState = _ref0.sortState,
-    onSort = _ref0.onSort,
-    filterOptions = _ref0.filterOptions,
-    colFilter = _ref0.colFilter,
-    onColFilter = _ref0.onColFilter,
-    filterable = _ref0.filterable;
-  var _useState = useState(false),
-    _useState2 = _slicedToArray(_useState, 2),
-    showFilter = _useState2[0],
-    setShowFilter = _useState2[1];
-  var wrapRef = useRef();
+function ColHeader({
+  label,
+  colKey,
+  sortState,
+  onSort,
+  filterOptions,
+  colFilter,
+  onColFilter,
+  filterable
+}) {
+  const [showFilter, setShowFilter] = useState(false);
+  const wrapRef = useRef();
 
   // Close filter when clicking outside handled inside ColFilterDropdown
-  var isSorted = (sortState === null || sortState === void 0 ? void 0 : sortState.col) === colKey;
-  var sortDir = isSorted ? sortState.dir : null;
-  var isFiltered = colFilter && colFilter.length > 0;
-  var handleSort = function handleSort(e) {
+  const isSorted = sortState?.col === colKey;
+  const sortDir = isSorted ? sortState.dir : null;
+  const isFiltered = colFilter && colFilter.length > 0;
+  const handleSort = e => {
     e.stopPropagation();
     if (!isSorted) {
       onSort(colKey, "asc");
@@ -783,11 +738,9 @@ function ColHeader(_ref0) {
     }
     onSort(null, null); // clear sort
   };
-  var handleFunnel = function handleFunnel(e) {
+  const handleFunnel = e => {
     e.stopPropagation();
-    setShowFilter(function (p) {
-      return !p;
-    });
+    setShowFilter(p => !p);
   };
   return /*#__PURE__*/React.createElement("div", {
     ref: wrapRef,
@@ -816,19 +769,15 @@ function ColHeader(_ref0) {
       letterSpacing: "0.09em",
       transition: "color 0.15s"
     },
-    onMouseEnter: function onMouseEnter(e) {
-      return e.currentTarget.style.color = T.blue;
-    },
-    onMouseLeave: function onMouseLeave(e) {
-      return e.currentTarget.style.color = isSorted ? T.blue : T.textMuted;
-    }
+    onMouseEnter: e => e.currentTarget.style.color = T.blue,
+    onMouseLeave: e => e.currentTarget.style.color = isSorted ? T.blue : T.textMuted
   }, /*#__PURE__*/React.createElement("span", null, label), /*#__PURE__*/React.createElement(SortArrow, {
     dir: sortDir
   })), filterable && /*#__PURE__*/React.createElement("button", {
     onClick: handleFunnel,
     style: {
       background: isFiltered ? T.blueLight : "none",
-      border: "1px solid ".concat(isFiltered ? T.blue : T.border),
+      border: `1px solid ${isFiltered ? T.blue : T.border}`,
       borderRadius: 4,
       padding: "2px 4px",
       cursor: "pointer",
@@ -836,12 +785,12 @@ function ColHeader(_ref0) {
       alignItems: "center",
       transition: "background 0.15s, border-color 0.15s"
     },
-    title: "Filter by ".concat(label),
-    onMouseEnter: function onMouseEnter(e) {
+    title: `Filter by ${label}`,
+    onMouseEnter: e => {
       e.currentTarget.style.background = T.blueLight;
       e.currentTarget.style.borderColor = T.blue;
     },
-    onMouseLeave: function onMouseLeave(e) {
+    onMouseLeave: e => {
       e.currentTarget.style.background = isFiltered ? T.blueLight : "none";
       e.currentTarget.style.borderColor = isFiltered ? T.blue : T.border;
     }
@@ -851,22 +800,21 @@ function ColHeader(_ref0) {
     colKey: label,
     options: filterOptions,
     selected: colFilter || [],
-    onChange: function onChange(vals) {
+    onChange: vals => {
       onColFilter(colKey, vals);
     },
-    onClose: function onClose() {
-      return setShowFilter(false);
-    }
+    onClose: () => setShowFilter(false)
   }));
 }
 
 // ── form helpers ──────────────────────────────────────────────────────────────
-function Inp(_ref1) {
-  var label = _ref1.label,
-    value = _ref1.value,
-    _onChange = _ref1.onChange,
-    required = _ref1.required,
-    children = _ref1.children;
+function Inp({
+  label,
+  value,
+  onChange,
+  required,
+  children
+}) {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 12
@@ -888,23 +836,18 @@ function Inp(_ref1) {
   }, " *")), children || /*#__PURE__*/React.createElement("input", {
     type: "text",
     value: value,
-    onChange: function onChange(e) {
-      return _onChange(e.target.value);
-    },
+    onChange: e => onChange(e.target.value),
     style: inputStyle,
-    onFocus: function onFocus(e) {
-      return e.target.style.borderColor = T.blue;
-    },
-    onBlur: function onBlur(e) {
-      return e.target.style.borderColor = T.border;
-    }
+    onFocus: e => e.target.style.borderColor = T.blue,
+    onBlur: e => e.target.style.borderColor = T.border
   }));
 }
-function Sel(_ref10) {
-  var label = _ref10.label,
-    value = _ref10.value,
-    _onChange2 = _ref10.onChange,
-    options = _ref10.options;
+function Sel({
+  label,
+  value,
+  onChange,
+  options
+}) {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 12
@@ -921,27 +864,24 @@ function Sel(_ref10) {
     }
   }, label), /*#__PURE__*/React.createElement("select", {
     value: value,
-    onChange: function onChange(e) {
-      return _onChange2(e.target.value);
-    },
+    onChange: e => onChange(e.target.value),
     style: inputStyle
-  }, options.map(function (o) {
-    return /*#__PURE__*/React.createElement("option", {
-      key: o
-    }, o);
-  })));
+  }, options.map(o => /*#__PURE__*/React.createElement("option", {
+    key: o
+  }, o))));
 }
-function PhSec(_ref11) {
-  var phase = _ref11.phase,
-    data = _ref11.data,
-    _onChange3 = _ref11.onChange;
+function PhSec({
+  phase,
+  data,
+  onChange
+}) {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       background: T.bg,
       borderRadius: 8,
       padding: "12px 14px",
       marginBottom: 8,
-      border: "1.5px solid ".concat(data.complete ? "#bbf7d0" : T.border)
+      border: `1.5px solid ${data.complete ? "#bbf7d0" : T.border}`
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -952,20 +892,19 @@ function PhSec(_ref11) {
     }
   }, /*#__PURE__*/React.createElement("input", {
     type: "checkbox",
-    id: "ph-".concat(phase),
+    id: `ph-${phase}`,
     checked: !!data.complete,
-    onChange: function onChange(e) {
-      return _onChange3(_objectSpread(_objectSpread({}, data), {}, {
-        complete: e.target.checked
-      }));
-    },
+    onChange: e => onChange({
+      ...data,
+      complete: e.target.checked
+    }),
     style: {
       width: 15,
       height: 15,
       accentColor: T.blue
     }
   }), /*#__PURE__*/React.createElement("label", {
-    htmlFor: "ph-".concat(phase),
+    htmlFor: `ph-${phase}`,
     style: {
       fontSize: 12,
       fontWeight: 700,
@@ -981,60 +920,28 @@ function PhSec(_ref11) {
       gap: 7,
       marginBottom: 7
     }
-  }, [["Assignee", "text", "assignee", "Name"], ["Due Date", "date", "dueDate", ""]].map(function (_ref12) {
-    var _ref13 = _slicedToArray(_ref12, 4),
-      lbl = _ref13[0],
-      typ = _ref13[1],
-      key = _ref13[2],
-      ph = _ref13[3];
-    return /*#__PURE__*/React.createElement("div", {
-      key: key
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 10,
-        color: T.textMuted,
-        textTransform: "uppercase",
-        letterSpacing: "0.06em",
-        marginBottom: 3
-      }
-    }, lbl), /*#__PURE__*/React.createElement("input", {
-      type: typ,
-      value: data[key] || "",
-      onChange: function onChange(e) {
-        return _onChange3(_objectSpread(_objectSpread({}, data), {}, _defineProperty({}, key, e.target.value)));
-      },
-      placeholder: ph,
-      style: {
-        width: "100%",
-        background: "#fff",
-        border: "1.5px solid ".concat(T.border),
-        borderRadius: 5,
-        color: T.text,
-        fontSize: 12,
-        padding: "5px 9px",
-        outline: "none",
-        fontFamily: "inherit",
-        boxSizing: "border-box"
-      },
-      onFocus: function onFocus(e) {
-        return e.target.style.borderColor = T.blue;
-      },
-      onBlur: function onBlur(e) {
-        return e.target.style.borderColor = T.border;
-      }
-    }));
-  })), /*#__PURE__*/React.createElement("input", {
-    value: data.notes || "",
-    onChange: function onChange(e) {
-      return _onChange3(_objectSpread(_objectSpread({}, data), {}, {
-        notes: e.target.value
-      }));
-    },
-    placeholder: "Notes...",
+  }, [["Assignee", "text", "assignee", "Name"], ["Due Date", "date", "dueDate", ""]].map(([lbl, typ, key, ph]) => /*#__PURE__*/React.createElement("div", {
+    key: key
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: T.textMuted,
+      textTransform: "uppercase",
+      letterSpacing: "0.06em",
+      marginBottom: 3
+    }
+  }, lbl), /*#__PURE__*/React.createElement("input", {
+    type: typ,
+    value: data[key] || "",
+    onChange: e => onChange({
+      ...data,
+      [key]: e.target.value
+    }),
+    placeholder: ph,
     style: {
       width: "100%",
       background: "#fff",
-      border: "1.5px solid ".concat(T.border),
+      border: `1.5px solid ${T.border}`,
       borderRadius: 5,
       color: T.text,
       fontSize: 12,
@@ -1043,77 +950,78 @@ function PhSec(_ref11) {
       fontFamily: "inherit",
       boxSizing: "border-box"
     },
-    onFocus: function onFocus(e) {
-      return e.target.style.borderColor = T.blue;
+    onFocus: e => e.target.style.borderColor = T.blue,
+    onBlur: e => e.target.style.borderColor = T.border
+  })))), /*#__PURE__*/React.createElement("input", {
+    value: data.notes || "",
+    onChange: e => onChange({
+      ...data,
+      notes: e.target.value
+    }),
+    placeholder: "Notes...",
+    style: {
+      width: "100%",
+      background: "#fff",
+      border: `1.5px solid ${T.border}`,
+      borderRadius: 5,
+      color: T.text,
+      fontSize: 12,
+      padding: "5px 9px",
+      outline: "none",
+      fontFamily: "inherit",
+      boxSizing: "border-box"
     },
-    onBlur: function onBlur(e) {
-      return e.target.style.borderColor = T.border;
-    }
+    onFocus: e => e.target.style.borderColor = T.blue,
+    onBlur: e => e.target.style.borderColor = T.border
   }));
 }
 
 // ── field-change pill ─────────────────────────────────────────────────────────
 // ── LogSection — ledger table layout ─────────────────────────────────────────
-function LogSection(_ref14) {
-  var log = _ref14.log,
-    onAddEntry = _ref14.onAddEntry,
-    onDeleteEntry = _ref14.onDeleteEntry;
-  var today = new Date().toISOString().slice(0, 10);
-  var _useState3 = useState(today),
-    _useState4 = _slicedToArray(_useState3, 2),
-    date = _useState4[0],
-    setDate = _useState4[1];
-  var _useState5 = useState(""),
-    _useState6 = _slicedToArray(_useState5, 2),
-    note = _useState6[0],
-    setNote = _useState6[1];
-  var _useState7 = useState("all"),
-    _useState8 = _slicedToArray(_useState7, 2),
-    filter = _useState8[0],
-    setFilter = _useState8[1];
-  var tableRef = useRef();
-  var handleAdd = function handleAdd() {
-    var trimmed = note.trim();
+function LogSection({
+  log,
+  onAddEntry,
+  onDeleteEntry
+}) {
+  const today = new Date().toISOString().slice(0, 10);
+  const [date, setDate] = useState(today);
+  const [note, setNote] = useState("");
+  const [filter, setFilter] = useState("all");
+  const tableRef = useRef();
+  const handleAdd = () => {
+    const trimmed = note.trim();
     if (!trimmed || !date) return;
     onAddEntry({
-      id: "log-".concat(Date.now(), "-").concat(Math.random().toString(36).slice(2, 5)),
+      id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
       type: "note",
-      date: date,
+      date,
       timestamp: new Date().toISOString(),
       note: trimmed
     });
     setNote("");
     setDate(today);
-    setTimeout(function () {
+    setTimeout(() => {
       if (tableRef.current) tableRef.current.scrollTop = 0;
     }, 60);
   };
-  var handleKey = function handleKey(ev) {
+  const handleKey = ev => {
     if (ev.key === "Enter" && (ev.metaKey || ev.ctrlKey)) handleAdd();
   };
-  var allEntries = _toConsumableArray(log || []).sort(function (a, b) {
-    var ta = a.timestamp || a.date + "T00:00:00Z";
-    var tb = b.timestamp || b.date + "T00:00:00Z";
+  const allEntries = [...(log || [])].sort((a, b) => {
+    const ta = a.timestamp || a.date + "T00:00:00Z";
+    const tb = b.timestamp || b.date + "T00:00:00Z";
     return tb.localeCompare(ta);
   });
-  var visible = filter === "all" ? allEntries : filter === "notes" ? allEntries.filter(function (x) {
-    return x.type === "note";
-  }) : allEntries.filter(function (x) {
-    return x.type === "change";
-  });
-  var noteCount = allEntries.filter(function (x) {
-    return x.type === "note";
-  }).length;
-  var changeCount = allEntries.filter(function (x) {
-    return x.type === "change";
-  }).length;
+  const visible = filter === "all" ? allEntries : filter === "notes" ? allEntries.filter(x => x.type === "note") : allEntries.filter(x => x.type === "change");
+  const noteCount = allEntries.filter(x => x.type === "note").length;
+  const changeCount = allEntries.filter(x => x.type === "change").length;
 
   // Flatten change entries into individual diff rows for the ledger
-  var ledgerRows = [];
-  visible.forEach(function (entry) {
+  const ledgerRows = [];
+  visible.forEach(entry => {
     if (entry.type === "note") {
       ledgerRows.push({
-        entry: entry,
+        entry,
         kind: "note",
         label: entry.note,
         field: "—",
@@ -1121,9 +1029,9 @@ function LogSection(_ref14) {
         to: "—"
       });
     } else if (entry.type === "change") {
-      (entry.changes || []).forEach(function (c, ci) {
+      (entry.changes || []).forEach((c, ci) => {
         ledgerRows.push({
-          entry: entry,
+          entry,
           kind: "change",
           rowIdx: ci,
           label: "",
@@ -1134,8 +1042,8 @@ function LogSection(_ref14) {
       });
     }
   });
-  var colW = "90px 60px 130px minmax(0,1fr) 100px 100px 28px";
-  var thStyle = {
+  const colW = "90px 60px 130px minmax(0,1fr) 100px 100px 28px";
+  const thStyle = {
     fontSize: 10,
     fontWeight: 700,
     color: T.textMuted,
@@ -1143,31 +1051,27 @@ function LogSection(_ref14) {
     letterSpacing: "0.08em",
     padding: "6px 8px",
     background: T.sidebar,
-    borderBottom: "1px solid ".concat(T.borderStrong),
+    borderBottom: `1px solid ${T.borderStrong}`,
     whiteSpace: "nowrap",
     userSelect: "none"
   };
-  var tabBtn = function tabBtn(v, lbl) {
-    return /*#__PURE__*/React.createElement("button", {
-      key: v,
-      onClick: function onClick() {
-        return setFilter(v);
-      },
-      style: {
-        fontSize: 10,
-        fontWeight: 600,
-        padding: "3px 10px",
-        borderRadius: 4,
-        cursor: "pointer",
-        border: "none",
-        letterSpacing: "0.05em",
-        textTransform: "uppercase",
-        background: filter === v ? T.blue : "transparent",
-        color: filter === v ? "#fff" : T.textMuted
-      }
-    }, lbl);
-  };
-  var canAdd = note.trim() && date;
+  const tabBtn = (v, lbl) => /*#__PURE__*/React.createElement("button", {
+    key: v,
+    onClick: () => setFilter(v),
+    style: {
+      fontSize: 10,
+      fontWeight: 600,
+      padding: "3px 10px",
+      borderRadius: 4,
+      cursor: "pointer",
+      border: "none",
+      letterSpacing: "0.05em",
+      textTransform: "uppercase",
+      background: filter === v ? T.blue : "transparent",
+      color: filter === v ? "#fff" : T.textMuted
+    }
+  }, lbl);
+  const canAdd = note.trim() && date;
   return /*#__PURE__*/React.createElement("div", {
     style: {
       marginTop: 22
@@ -1210,11 +1114,11 @@ function LogSection(_ref14) {
       background: T.bg,
       borderRadius: 5,
       padding: 2,
-      border: "1px solid ".concat(T.border)
+      border: `1px solid ${T.border}`
     }
-  }, tabBtn("all", "All"), tabBtn("notes", "Notes ".concat(noteCount)), tabBtn("changes", "Changes ".concat(changeCount)))), /*#__PURE__*/React.createElement("div", {
+  }, tabBtn("all", "All"), tabBtn("notes", `Notes ${noteCount}`), tabBtn("changes", `Changes ${changeCount}`))), /*#__PURE__*/React.createElement("div", {
     style: {
-      border: "1px solid ".concat(T.border),
+      border: `1px solid ${T.border}`,
       borderRadius: 7,
       overflow: "hidden",
       marginBottom: 8
@@ -1225,14 +1129,13 @@ function LogSection(_ref14) {
       gridTemplateColumns: colW,
       gap: 0
     }
-  }, ["Date", "Type", "Field / Note", "Detail", "From", "To", ""].map(function (h, i) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: i,
-      style: _objectSpread(_objectSpread({}, thStyle), {}, {
-        borderRight: i < 6 ? "1px solid ".concat(T.border) : "none"
-      })
-    }, h);
-  })), /*#__PURE__*/React.createElement("div", {
+  }, ["Date", "Type", "Field / Note", "Detail", "From", "To", ""].map((h, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      ...thStyle,
+      borderRight: i < 6 ? `1px solid ${T.border}` : "none"
+    }
+  }, h))), /*#__PURE__*/React.createElement("div", {
     ref: tableRef,
     style: {
       maxHeight: 200,
@@ -1247,29 +1150,28 @@ function LogSection(_ref14) {
       fontSize: 12,
       gridColumn: "1/-1"
     }
-  }, filter === "all" ? "No history yet." : filter === "notes" ? "No notes yet." : "No changes recorded yet.") : ledgerRows.map(function (row, idx) {
-    var _row$rowIdx;
-    var isNote = row.kind === "note";
-    var isFirst = idx === 0 || ledgerRows[idx - 1].entry.id !== row.entry.id;
-    var isLast = idx === ledgerRows.length - 1;
-    var bg = idx % 2 === 0 ? T.surface : T.bg;
+  }, filter === "all" ? "No history yet." : filter === "notes" ? "No notes yet." : "No changes recorded yet.") : ledgerRows.map((row, idx) => {
+    const isNote = row.kind === "note";
+    const isFirst = idx === 0 || ledgerRows[idx - 1].entry.id !== row.entry.id;
+    const isLast = idx === ledgerRows.length - 1;
+    const bg = idx % 2 === 0 ? T.surface : T.bg;
     return /*#__PURE__*/React.createElement("div", {
-      key: "".concat(row.entry.id, "-").concat((_row$rowIdx = row.rowIdx) !== null && _row$rowIdx !== void 0 ? _row$rowIdx : 0),
+      key: `${row.entry.id}-${row.rowIdx ?? 0}`,
       style: {
         display: "grid",
         gridTemplateColumns: colW,
         gap: 0,
-        borderBottom: isLast ? "none" : "1px solid ".concat(T.border),
+        borderBottom: isLast ? "none" : `1px solid ${T.border}`,
         background: bg
       },
-      onMouseEnter: function onMouseEnter(ev) {
+      onMouseEnter: ev => {
         ev.currentTarget.style.background = "#efefef";
-        var d = ev.currentTarget.querySelector(".del-btn");
+        const d = ev.currentTarget.querySelector(".del-btn");
         if (d) d.style.opacity = "1";
       },
-      onMouseLeave: function onMouseLeave(ev) {
+      onMouseLeave: ev => {
         ev.currentTarget.style.background = bg;
-        var d = ev.currentTarget.querySelector(".del-btn");
+        const d = ev.currentTarget.querySelector(".del-btn");
         if (d) d.style.opacity = "0";
       }
     }, /*#__PURE__*/React.createElement("div", {
@@ -1278,14 +1180,14 @@ function LogSection(_ref14) {
         fontSize: 11,
         color: T.textMuted,
         fontFamily: "monospace",
-        borderRight: "1px solid ".concat(T.border),
+        borderRight: `1px solid ${T.border}`,
         whiteSpace: "nowrap",
         alignSelf: "center"
       }
     }, isFirst ? row.entry.date : ""), /*#__PURE__*/React.createElement("div", {
       style: {
         padding: "6px 8px",
-        borderRight: "1px solid ".concat(T.border),
+        borderRight: `1px solid ${T.border}`,
         alignSelf: "center"
       }
     }, isFirst && (isNote ? /*#__PURE__*/React.createElement("span", {
@@ -1316,7 +1218,7 @@ function LogSection(_ref14) {
         fontSize: 12,
         color: isNote ? T.text : T.textSec,
         fontWeight: isNote ? 400 : 500,
-        borderRight: "1px solid ".concat(T.border),
+        borderRight: `1px solid ${T.border}`,
         overflow: "hidden",
         textOverflow: "ellipsis",
         whiteSpace: "nowrap",
@@ -1327,7 +1229,7 @@ function LogSection(_ref14) {
         padding: "6px 8px",
         fontSize: 12,
         color: T.textMuted,
-        borderRight: "1px solid ".concat(T.border),
+        borderRight: `1px solid ${T.border}`,
         overflow: "hidden",
         textOverflow: "ellipsis",
         whiteSpace: "nowrap",
@@ -1339,7 +1241,7 @@ function LogSection(_ref14) {
         padding: "6px 8px",
         fontSize: 11,
         color: "#8a9aaa",
-        borderRight: "1px solid ".concat(T.border),
+        borderRight: `1px solid ${T.border}`,
         overflow: "hidden",
         textOverflow: "ellipsis",
         whiteSpace: "nowrap",
@@ -1352,7 +1254,7 @@ function LogSection(_ref14) {
         fontSize: 11,
         fontWeight: !isNote ? 600 : 400,
         color: !isNote ? T.blue : T.textMuted,
-        borderRight: "1px solid ".concat(T.border),
+        borderRight: `1px solid ${T.border}`,
         overflow: "hidden",
         textOverflow: "ellipsis",
         whiteSpace: "nowrap",
@@ -1366,9 +1268,7 @@ function LogSection(_ref14) {
       }
     }, isNote && isFirst && /*#__PURE__*/React.createElement("button", {
       className: "del-btn",
-      onClick: function onClick() {
-        return onDeleteEntry(row.entry.id);
-      },
+      onClick: () => onDeleteEntry(row.entry.id),
       style: {
         opacity: 0,
         background: "none",
@@ -1388,16 +1288,14 @@ function LogSection(_ref14) {
       gap: 6,
       alignItems: "center",
       background: T.surface,
-      border: "1px solid ".concat(T.border),
+      border: `1px solid ${T.border}`,
       borderRadius: 6,
       padding: "5px 8px"
     }
   }, /*#__PURE__*/React.createElement("input", {
     type: "date",
     value: date,
-    onChange: function onChange(ev) {
-      return setDate(ev.target.value);
-    },
+    onChange: ev => setDate(ev.target.value),
     style: {
       flexShrink: 0,
       width: 126,
@@ -1409,12 +1307,8 @@ function LogSection(_ref14) {
       outline: "none",
       fontFamily: "inherit"
     },
-    onFocus: function onFocus(ev) {
-      return ev.target.style.background = T.bg;
-    },
-    onBlur: function onBlur(ev) {
-      return ev.target.style.background = "transparent";
-    }
+    onFocus: ev => ev.target.style.background = T.bg,
+    onBlur: ev => ev.target.style.background = "transparent"
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       width: 1,
@@ -1424,9 +1318,7 @@ function LogSection(_ref14) {
     }
   }), /*#__PURE__*/React.createElement("input", {
     value: note,
-    onChange: function onChange(ev) {
-      return setNote(ev.target.value);
-    },
+    onChange: ev => setNote(ev.target.value),
     onKeyDown: handleKey,
     placeholder: "Add a note\u2026 (Enter to submit)",
     style: {
@@ -1459,55 +1351,53 @@ function LogSection(_ref14) {
 }
 
 // ── DetailModal ───────────────────────────────────────────────────────────────
-function DetailModal(_ref15) {
-  var etool = _ref15.etool,
-    onClose = _ref15.onClose,
-    onSave = _ref15.onSave,
-    onDelete = _ref15.onDelete,
-    onAddLog = _ref15.onAddLog,
-    onDeleteLog = _ref15.onDeleteLog;
-  var _useState9 = useState(false),
-    _useState0 = _slicedToArray(_useState9, 2),
-    editing = _useState0[0],
-    setEditing = _useState0[1];
+function DetailModal({
+  etool,
+  onClose,
+  onSave,
+  onDelete,
+  onAddLog,
+  onDeleteLog
+}) {
+  const [editing, setEditing] = useState(false);
   // form is the single source of truth for all displayed data (view + edit modes)
-  var _useState1 = useState(_objectSpread(_objectSpread({}, etool), {}, {
-      phases: _objectSpread({}, etool.phases),
-      log: _toConsumableArray(etool.log || [])
-    })),
-    _useState10 = _slicedToArray(_useState1, 2),
-    form = _useState10[0],
-    setForm = _useState10[1];
+  const [form, setForm] = useState({
+    ...etool,
+    phases: {
+      ...etool.phases
+    },
+    log: [...(etool.log || [])]
+  });
 
   // Keep form in sync when parent pushes log updates (add/delete note from App)
   // but only for the log field, never overwrite in-progress edits
-  useEffect(function () {
-    setForm(function (f) {
-      return _objectSpread(_objectSpread({}, f), {}, {
-        log: _toConsumableArray(etool.log || [])
-      });
-    });
+  useEffect(() => {
+    setForm(f => ({
+      ...f,
+      log: [...(etool.log || [])]
+    }));
   }, [etool.log]);
-  var upPh = function upPh(ph, dat) {
-    return setForm(function (f) {
-      return _objectSpread(_objectSpread({}, f), {}, {
-        phases: _objectSpread(_objectSpread({}, f.phases), {}, _defineProperty({}, ph, dat))
-      });
-    });
-  };
-  var save = function save() {
-    var changes = diffEtool(etool, form);
-    var finalLog = changes.length > 0 ? [].concat(_toConsumableArray(form.log || []), [makeChangeEntry(changes)]) : form.log || [];
-    var updatedForm = _objectSpread(_objectSpread({}, form), {}, {
+  const upPh = (ph, dat) => setForm(f => ({
+    ...f,
+    phases: {
+      ...f.phases,
+      [ph]: dat
+    }
+  }));
+  const save = () => {
+    const changes = diffEtool(etool, form);
+    const finalLog = changes.length > 0 ? [...(form.log || []), makeChangeEntry(changes)] : form.log || [];
+    const updatedForm = {
+      ...form,
       log: finalLog
-    });
+    };
     onSave(updatedForm);
     setForm(updatedForm); // immediately reflect new log in view mode
     setEditing(false);
   };
 
   // disp = display data, always reads from form state (single source of truth)
-  var disp = form;
+  const disp = form;
   return /*#__PURE__*/React.createElement("div", {
     style: {
       position: "fixed",
@@ -1520,14 +1410,14 @@ function DetailModal(_ref15) {
       padding: "24px 16px",
       overflowY: "auto"
     },
-    onClick: function onClick(ev) {
+    onClick: ev => {
       if (ev.target === ev.currentTarget) onClose();
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       background: T.surface,
-      border: "1px solid ".concat(T.border),
-      borderTop: "3px solid ".concat(T.blue),
+      border: `1px solid ${T.border}`,
+      borderTop: `3px solid ${T.blue}`,
       borderRadius: 6,
       width: "100%",
       maxWidth: 680,
@@ -1584,44 +1474,35 @@ function DetailModal(_ref15) {
       gap: 9,
       marginBottom: 16
     }
-  }, [["Part #", disp.partNumber], ["Material", disp.material], ["Requester", disp.requester], ["Created", disp.created]].filter(function (_ref16) {
-    var _ref17 = _slicedToArray(_ref16, 2),
-      v = _ref17[1];
-    return v;
-  }).map(function (_ref18) {
-    var _ref19 = _slicedToArray(_ref18, 2),
-      k = _ref19[0],
-      v = _ref19[1];
-    return /*#__PURE__*/React.createElement("div", {
-      key: k,
-      style: {
-        background: T.bg,
-        borderRadius: 7,
-        padding: "9px 13px",
-        border: "1px solid ".concat(T.border)
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 10,
-        color: T.textMuted,
-        textTransform: "uppercase",
-        letterSpacing: "0.07em",
-        marginBottom: 3
-      }
-    }, k), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 13,
-        color: T.text,
-        fontWeight: 600
-      }
-    }, v));
-  })), /*#__PURE__*/React.createElement("div", {
+  }, [["Part #", disp.partNumber], ["Material", disp.material], ["Requester", disp.requester], ["Created", disp.created]].filter(([, v]) => v).map(([k, v]) => /*#__PURE__*/React.createElement("div", {
+    key: k,
+    style: {
+      background: T.bg,
+      borderRadius: 7,
+      padding: "9px 13px",
+      border: `1px solid ${T.border}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: T.textMuted,
+      textTransform: "uppercase",
+      letterSpacing: "0.07em",
+      marginBottom: 3
+    }
+  }, k), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: T.text,
+      fontWeight: 600
+    }
+  }, v)))), /*#__PURE__*/React.createElement("div", {
     style: {
       background: T.bg,
       borderRadius: 8,
       padding: "12px 14px",
       marginBottom: 16,
-      border: "1px solid ".concat(T.border)
+      border: `1px solid ${T.border}`
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1646,12 +1527,12 @@ function DetailModal(_ref15) {
       letterSpacing: "0.08em",
       marginBottom: 10
     }
-  }, "Phases"), PHASES.map(function (ph) {
-    var dat = disp.phases[ph];
+  }, "Phases"), PHASES.map(ph => {
+    const dat = disp.phases[ph];
     return /*#__PURE__*/React.createElement("div", {
       key: ph,
       style: {
-        borderLeft: "3px solid ".concat(dat.complete ? T.success : T.border),
+        borderLeft: `3px solid ${dat.complete ? T.success : T.border}`,
         paddingLeft: 14,
         marginBottom: 11
       }
@@ -1690,24 +1571,18 @@ function DetailModal(_ref15) {
     }, dat.notes));
   }), /*#__PURE__*/React.createElement(LogSection, {
     log: disp.log || [],
-    onAddEntry: function onAddEntry(entry) {
-      return onAddLog(disp.id, entry);
-    },
-    onDeleteEntry: function onDeleteEntry(logId) {
-      return onDeleteLog(disp.id, logId);
-    }
+    onAddEntry: entry => onAddLog(disp.id, entry),
+    onDeleteEntry: logId => onDeleteLog(disp.id, logId)
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 9,
       marginTop: 20,
       paddingTop: 16,
-      borderTop: "1px solid ".concat(T.border)
+      borderTop: `1px solid ${T.border}`
     }
   }, /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return setEditing(true);
-    },
+    onClick: () => setEditing(true),
     style: {
       background: T.blue,
       border: "none",
@@ -1719,12 +1594,10 @@ function DetailModal(_ref15) {
       cursor: "pointer"
     }
   }, "Edit"), /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return onDelete(disp.id);
-    },
+    onClick: () => onDelete(disp.id),
     style: {
       background: "none",
-      border: "1.5px solid ".concat(T.dangerLight),
+      border: `1.5px solid ${T.dangerLight}`,
       borderRadius: 7,
       color: T.danger,
       fontSize: 13,
@@ -1744,95 +1617,68 @@ function DetailModal(_ref15) {
   }, /*#__PURE__*/React.createElement(Inp, {
     label: "Title",
     value: form.title,
-    onChange: function onChange(v) {
-      return setForm(function (prev) {
-        return _objectSpread(_objectSpread({}, prev), {}, {
-          title: v
-        });
-      });
-    },
+    onChange: v => setForm(prev => ({
+      ...prev,
+      title: v
+    })),
     required: true
   })), /*#__PURE__*/React.createElement(Inp, {
     label: "Part Number",
     value: form.partNumber,
-    onChange: function onChange(v) {
-      return setForm(function (prev) {
-        return _objectSpread(_objectSpread({}, prev), {}, {
-          partNumber: v
-        });
-      });
-    }
+    onChange: v => setForm(prev => ({
+      ...prev,
+      partNumber: v
+    }))
   }), /*#__PURE__*/React.createElement(Inp, {
     label: "Material",
     value: form.material,
-    onChange: function onChange(v) {
-      return setForm(function (prev) {
-        return _objectSpread(_objectSpread({}, prev), {}, {
-          material: v
-        });
-      });
-    }
+    onChange: v => setForm(prev => ({
+      ...prev,
+      material: v
+    }))
   }), /*#__PURE__*/React.createElement(Inp, {
     label: "Requester",
     value: form.requester,
-    onChange: function onChange(v) {
-      return setForm(function (prev) {
-        return _objectSpread(_objectSpread({}, prev), {}, {
-          requester: v
-        });
-      });
-    }
+    onChange: v => setForm(prev => ({
+      ...prev,
+      requester: v
+    }))
   }), /*#__PURE__*/React.createElement(Sel, {
     label: "Status",
     value: form.status,
-    onChange: function onChange(v) {
-      return setForm(function (prev) {
-        return _objectSpread(_objectSpread({}, prev), {}, {
-          status: v
-        });
-      });
-    },
+    onChange: v => setForm(prev => ({
+      ...prev,
+      status: v
+    })),
     options: Object.keys(STATUSES)
   }), /*#__PURE__*/React.createElement(Sel, {
     label: "Priority",
     value: form.priority,
-    onChange: function onChange(v) {
-      return setForm(function (prev) {
-        return _objectSpread(_objectSpread({}, prev), {}, {
-          priority: v
-        });
-      });
-    },
+    onChange: v => setForm(prev => ({
+      ...prev,
+      priority: v
+    })),
     options: ["Critical", "High", "Medium", "Low"]
   })), /*#__PURE__*/React.createElement(Inp, {
     label: "Description",
     value: form.description,
-    onChange: function onChange(v) {
-      return setForm(function (prev) {
-        return _objectSpread(_objectSpread({}, prev), {}, {
-          description: v
-        });
-      });
-    }
+    onChange: v => setForm(prev => ({
+      ...prev,
+      description: v
+    }))
   }, /*#__PURE__*/React.createElement("textarea", {
     value: form.description,
-    onChange: function onChange(ev) {
-      return setForm(function (prev) {
-        return _objectSpread(_objectSpread({}, prev), {}, {
-          description: ev.target.value
-        });
-      });
-    },
+    onChange: ev => setForm(prev => ({
+      ...prev,
+      description: ev.target.value
+    })),
     rows: 3,
-    style: _objectSpread(_objectSpread({}, inputStyle), {}, {
+    style: {
+      ...inputStyle,
       resize: "vertical"
-    }),
-    onFocus: function onFocus(ev) {
-      return ev.target.style.borderColor = T.blue;
     },
-    onBlur: function onBlur(ev) {
-      return ev.target.style.borderColor = T.border;
-    }
+    onFocus: ev => ev.target.style.borderColor = T.blue,
+    onBlur: ev => ev.target.style.borderColor = T.border
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
@@ -1842,16 +1688,12 @@ function DetailModal(_ref15) {
       letterSpacing: "0.08em",
       marginBottom: 9
     }
-  }, "Phases"), PHASES.map(function (ph) {
-    return /*#__PURE__*/React.createElement(PhSec, {
-      key: ph,
-      phase: ph,
-      data: form.phases[ph],
-      onChange: function onChange(dat) {
-        return upPh(ph, dat);
-      }
-    });
-  }), /*#__PURE__*/React.createElement("div", {
+  }, "Phases"), PHASES.map(ph => /*#__PURE__*/React.createElement(PhSec, {
+    key: ph,
+    phase: ph,
+    data: form.phases[ph],
+    onChange: dat => upPh(ph, dat)
+  })), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 9,
@@ -1870,16 +1712,19 @@ function DetailModal(_ref15) {
       cursor: "pointer"
     }
   }, "Save"), /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      setForm(_objectSpread(_objectSpread({}, etool), {}, {
-        phases: _objectSpread({}, etool.phases),
-        log: _toConsumableArray(etool.log || [])
-      }));
+    onClick: () => {
+      setForm({
+        ...etool,
+        phases: {
+          ...etool.phases
+        },
+        log: [...(etool.log || [])]
+      });
       setEditing(false);
     },
     style: {
       background: "none",
-      border: "1.5px solid ".concat(T.border),
+      border: `1.5px solid ${T.border}`,
       borderRadius: 7,
       color: T.textSec,
       fontSize: 13,
@@ -1890,27 +1735,26 @@ function DetailModal(_ref15) {
 }
 
 // ── CreateModal ───────────────────────────────────────────────────────────────
-function CreateModal(_ref20) {
-  var onClose = _ref20.onClose,
-    onCreate = _ref20.onCreate,
-    nextId = _ref20.nextId;
-  var _useState11 = useState(emptyForm()),
-    _useState12 = _slicedToArray(_useState11, 2),
-    form = _useState12[0],
-    setForm = _useState12[1];
-  var upPh = function upPh(ph, dat) {
-    return setForm(function (f) {
-      return _objectSpread(_objectSpread({}, f), {}, {
-        phases: _objectSpread(_objectSpread({}, f.phases), {}, _defineProperty({}, ph, dat))
-      });
-    });
-  };
-  var submit = function submit() {
+function CreateModal({
+  onClose,
+  onCreate,
+  nextId
+}) {
+  const [form, setForm] = useState(emptyForm());
+  const upPh = (ph, dat) => setForm(f => ({
+    ...f,
+    phases: {
+      ...f.phases,
+      [ph]: dat
+    }
+  }));
+  const submit = () => {
     if (!form.title.trim()) return;
-    onCreate(_objectSpread(_objectSpread({}, form), {}, {
+    onCreate({
+      ...form,
       id: nextId,
       created: new Date().toISOString().slice(0, 10)
-    }));
+    });
     onClose();
   };
   return /*#__PURE__*/React.createElement("div", {
@@ -1925,14 +1769,14 @@ function CreateModal(_ref20) {
       padding: "24px 16px",
       overflowY: "auto"
     },
-    onClick: function onClick(ev) {
+    onClick: ev => {
       if (ev.target === ev.currentTarget) onClose();
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       background: T.surface,
-      border: "1px solid ".concat(T.border),
-      borderTop: "3px solid ".concat(T.blue),
+      border: `1px solid ${T.border}`,
+      borderTop: `3px solid ${T.blue}`,
       borderRadius: 6,
       width: "100%",
       maxWidth: 660,
@@ -1985,85 +1829,61 @@ function CreateModal(_ref20) {
   }, /*#__PURE__*/React.createElement(Inp, {
     label: "Part / Assembly Title",
     value: form.title,
-    onChange: function onChange(v) {
-      return setForm(function (f) {
-        return _objectSpread(_objectSpread({}, f), {}, {
-          title: v
-        });
-      });
-    },
+    onChange: v => setForm(f => ({
+      ...f,
+      title: v
+    })),
     required: true
   })), /*#__PURE__*/React.createElement(Inp, {
     label: "Part Number",
     value: form.partNumber,
-    onChange: function onChange(v) {
-      return setForm(function (f) {
-        return _objectSpread(_objectSpread({}, f), {}, {
-          partNumber: v
-        });
-      });
-    }
+    onChange: v => setForm(f => ({
+      ...f,
+      partNumber: v
+    }))
   }), /*#__PURE__*/React.createElement(Inp, {
     label: "Material",
     value: form.material,
-    onChange: function onChange(v) {
-      return setForm(function (f) {
-        return _objectSpread(_objectSpread({}, f), {}, {
-          material: v
-        });
-      });
-    }
+    onChange: v => setForm(f => ({
+      ...f,
+      material: v
+    }))
   }), /*#__PURE__*/React.createElement(Inp, {
     label: "Requester",
     value: form.requester,
-    onChange: function onChange(v) {
-      return setForm(function (f) {
-        return _objectSpread(_objectSpread({}, f), {}, {
-          requester: v
-        });
-      });
-    }
+    onChange: v => setForm(f => ({
+      ...f,
+      requester: v
+    }))
   }), /*#__PURE__*/React.createElement(Sel, {
     label: "Priority",
     value: form.priority,
-    onChange: function onChange(v) {
-      return setForm(function (f) {
-        return _objectSpread(_objectSpread({}, f), {}, {
-          priority: v
-        });
-      });
-    },
+    onChange: v => setForm(f => ({
+      ...f,
+      priority: v
+    })),
     options: ["Critical", "High", "Medium", "Low"]
   })), /*#__PURE__*/React.createElement(Inp, {
     label: "Description",
     value: form.description,
-    onChange: function onChange(v) {
-      return setForm(function (f) {
-        return _objectSpread(_objectSpread({}, f), {}, {
-          description: v
-        });
-      });
-    }
+    onChange: v => setForm(f => ({
+      ...f,
+      description: v
+    }))
   }, /*#__PURE__*/React.createElement("textarea", {
     value: form.description,
-    onChange: function onChange(ev) {
-      return setForm(function (f) {
-        return _objectSpread(_objectSpread({}, f), {}, {
-          description: ev.target.value
-        });
-      });
-    },
+    onChange: ev => setForm(f => ({
+      ...f,
+      description: ev.target.value
+    })),
     rows: 3,
     placeholder: "Describe the engineering requirement...",
-    style: _objectSpread(_objectSpread({}, inputStyle), {}, {
+    style: {
+      ...inputStyle,
       resize: "vertical"
-    }),
-    onFocus: function onFocus(e) {
-      return e.target.style.borderColor = T.blue;
     },
-    onBlur: function onBlur(e) {
-      return e.target.style.borderColor = T.border;
-    }
+    onFocus: e => e.target.style.borderColor = T.blue,
+    onBlur: e => e.target.style.borderColor = T.border
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
@@ -2073,16 +1893,12 @@ function CreateModal(_ref20) {
       letterSpacing: "0.08em",
       marginBottom: 9
     }
-  }, "Phases (optional)"), PHASES.map(function (ph) {
-    return /*#__PURE__*/React.createElement(PhSec, {
-      key: ph,
-      phase: ph,
-      data: form.phases[ph],
-      onChange: function onChange(dat) {
-        return upPh(ph, dat);
-      }
-    });
-  }), /*#__PURE__*/React.createElement("div", {
+  }, "Phases (optional)"), PHASES.map(ph => /*#__PURE__*/React.createElement(PhSec, {
+    key: ph,
+    phase: ph,
+    data: form.phases[ph],
+    onChange: dat => upPh(ph, dat)
+  })), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 9,
@@ -2104,7 +1920,7 @@ function CreateModal(_ref20) {
     onClick: onClose,
     style: {
       background: "none",
-      border: "1.5px solid ".concat(T.border),
+      border: `1.5px solid ${T.border}`,
       borderRadius: 7,
       color: T.textSec,
       fontSize: 13,
@@ -2116,7 +1932,7 @@ function CreateModal(_ref20) {
 
 // ── FilterModal ───────────────────────────────────────────────────────────────
 // Column definitions for the filter modal
-var FILTER_COLS = [{
+const FILTER_COLS = [{
   key: "id",
   label: "ID",
   type: "text",
@@ -2167,33 +1983,30 @@ var FILTER_COLS = [{
   type: "select",
   options: ["", "Not started (0%)", "Design done (33%)", "Proc done (67%)", "Complete (100%)"]
 }];
-function FilterModal(_ref21) {
-  var current = _ref21.current,
-    onApply = _ref21.onApply,
-    onClose = _ref21.onClose;
-  var _useState13 = useState(_objectSpread({}, current)),
-    _useState14 = _slicedToArray(_useState13, 2),
-    draft = _useState14[0],
-    setDraft = _useState14[1];
-  var set = function set(key, val) {
-    return setDraft(function (prev) {
-      return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, key, val));
-    });
-  };
-  var handleApply = function handleApply() {
+function FilterModal({
+  current,
+  onApply,
+  onClose
+}) {
+  const [draft, setDraft] = useState({
+    ...current
+  });
+  const set = (key, val) => setDraft(prev => ({
+    ...prev,
+    [key]: val
+  }));
+  const handleApply = () => {
     onApply(draft);
     onClose();
   };
-  var handleClear = function handleClear() {
+  const handleClear = () => {
     setDraft({});
   };
-  var activeCount = Object.values(draft).filter(function (v) {
-    return v && v !== "";
-  }).length;
-  var iStyle = {
+  const activeCount = Object.values(draft).filter(v => v && v !== "").length;
+  const iStyle = {
     width: "100%",
     background: T.bg,
-    border: "1px solid ".concat(T.border),
+    border: `1px solid ${T.border}`,
     borderRadius: 5,
     color: T.text,
     fontSize: 13,
@@ -2213,14 +2026,14 @@ function FilterModal(_ref21) {
       justifyContent: "center",
       padding: "24px 16px"
     },
-    onClick: function onClick(ev) {
+    onClick: ev => {
       if (ev.target === ev.currentTarget) onClose();
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       background: T.surface,
-      border: "1px solid ".concat(T.border),
-      borderTop: "3px solid ".concat(T.blue),
+      border: `1px solid ${T.border}`,
+      borderTop: `3px solid ${T.blue}`,
       borderRadius: 6,
       width: "100%",
       maxWidth: 560,
@@ -2235,7 +2048,7 @@ function FilterModal(_ref21) {
       alignItems: "center",
       justifyContent: "space-between",
       padding: "18px 22px 14px",
-      borderBottom: "1px solid ".concat(T.border)
+      borderBottom: `1px solid ${T.border}`
     }
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2267,8 +2080,8 @@ function FilterModal(_ref21) {
       flex: 1,
       padding: "6px 0"
     }
-  }, FILTER_COLS.map(function (col) {
-    var val = draft[col.key] || "";
+  }, FILTER_COLS.map(col => {
+    const val = draft[col.key] || "";
     return /*#__PURE__*/React.createElement("div", {
       key: col.key,
       style: {
@@ -2277,7 +2090,7 @@ function FilterModal(_ref21) {
         alignItems: "center",
         gap: 14,
         padding: "10px 22px",
-        borderBottom: "1px solid ".concat(T.border)
+        borderBottom: `1px solid ${T.border}`
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
@@ -2292,22 +2105,16 @@ function FilterModal(_ref21) {
       }
     }, col.type === "select" ? /*#__PURE__*/React.createElement("select", {
       value: val,
-      onChange: function onChange(ev) {
-        return set(col.key, ev.target.value);
+      onChange: ev => set(col.key, ev.target.value),
+      style: {
+        ...iStyle
       },
-      style: _objectSpread({}, iStyle),
-      onFocus: function onFocus(ev) {
-        return ev.target.style.borderColor = T.blue;
-      },
-      onBlur: function onBlur(ev) {
-        return ev.target.style.borderColor = T.border;
-      }
-    }, col.options.map(function (o) {
-      return /*#__PURE__*/React.createElement("option", {
-        key: o,
-        value: o
-      }, o || "— Any —");
-    })) : /*#__PURE__*/React.createElement("div", {
+      onFocus: ev => ev.target.style.borderColor = T.blue,
+      onBlur: ev => ev.target.style.borderColor = T.border
+    }, col.options.map(o => /*#__PURE__*/React.createElement("option", {
+      key: o,
+      value: o
+    }, o || "— Any —"))) : /*#__PURE__*/React.createElement("div", {
       style: {
         display: "flex",
         alignItems: "center",
@@ -2317,22 +2124,15 @@ function FilterModal(_ref21) {
       type: col.type,
       value: val,
       placeholder: col.placeholder,
-      onChange: function onChange(ev) {
-        return set(col.key, ev.target.value);
-      },
-      style: _objectSpread(_objectSpread({}, iStyle), {}, {
+      onChange: ev => set(col.key, ev.target.value),
+      style: {
+        ...iStyle,
         flex: 1
-      }),
-      onFocus: function onFocus(ev) {
-        return ev.target.style.borderColor = T.blue;
       },
-      onBlur: function onBlur(ev) {
-        return ev.target.style.borderColor = T.border;
-      }
+      onFocus: ev => ev.target.style.borderColor = T.blue,
+      onBlur: ev => ev.target.style.borderColor = T.border
     }), val && /*#__PURE__*/React.createElement("button", {
-      onClick: function onClick() {
-        return set(col.key, "");
-      },
+      onClick: () => set(col.key, ""),
       style: {
         flexShrink: 0,
         background: "none",
@@ -2352,13 +2152,13 @@ function FilterModal(_ref21) {
         height: 7,
         borderRadius: "50%",
         background: T.blue,
-        border: "1.5px solid ".concat(T.surface)
+        border: `1.5px solid ${T.surface}`
       }
     })));
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "14px 22px",
-      borderTop: "1px solid ".concat(T.border),
+      borderTop: `1px solid ${T.border}`,
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
@@ -2368,7 +2168,7 @@ function FilterModal(_ref21) {
     onClick: handleClear,
     style: {
       background: "none",
-      border: "1px solid ".concat(T.border),
+      border: `1px solid ${T.border}`,
       borderRadius: 5,
       color: T.textMuted,
       fontSize: 12,
@@ -2385,7 +2185,7 @@ function FilterModal(_ref21) {
     onClick: onClose,
     style: {
       background: "none",
-      border: "1px solid ".concat(T.border),
+      border: `1px solid ${T.border}`,
       borderRadius: 5,
       color: T.textSec,
       fontSize: 13,
@@ -2397,7 +2197,7 @@ function FilterModal(_ref21) {
     onClick: handleApply,
     style: {
       background: T.blue,
-      border: "1px solid ".concat(T.blue),
+      border: `1px solid ${T.blue}`,
       borderRadius: 5,
       color: "#fff",
       fontSize: 13,
@@ -2406,11 +2206,11 @@ function FilterModal(_ref21) {
       cursor: "pointer",
       fontFamily: "inherit"
     }
-  }, "Apply", activeCount > 0 ? " (".concat(activeCount, ")") : "")))));
+  }, "Apply", activeCount > 0 ? ` (${activeCount})` : "")))));
 }
 
 // ── date preset helpers ───────────────────────────────────────────────────────
-var DATE_PRESETS = [{
+const DATE_PRESETS = [{
   label: "All time",
   v: "all"
 }, {
@@ -2430,26 +2230,26 @@ var DATE_PRESETS = [{
   v: "custom"
 }];
 function presetRange(v) {
-  var now = new Date();
-  var to = now.toISOString().slice(0, 10);
+  const now = new Date();
+  const to = now.toISOString().slice(0, 10);
   if (v === "all") return {
     from: "",
     to: ""
   };
-  var f = new Date(now);
+  const f = new Date(now);
   if (v === "30d") f.setDate(f.getDate() - 30);
   if (v === "90d") f.setDate(f.getDate() - 90);
   if (v === "6mo") f.setMonth(f.getMonth() - 6);
   if (v === "1yr") f.setFullYear(f.getFullYear() - 1);
   return {
     from: f.toISOString().slice(0, 10),
-    to: to
+    to
   };
 }
 
 // ── column definitions ────────────────────────────────────────────────────────
 // key = field on etool object, or special keys "progress"
-var COLS = [{
+const COLS = [{
   key: "id",
   label: "ID",
   width: "76px",
@@ -2504,182 +2304,120 @@ var COLS = [{
   sortable: false,
   filterable: false
 }];
-var GRID = COLS.map(function (c) {
-  return c.width;
-}).join(" ");
+const GRID = COLS.map(c => c.width).join(" ");
 
 // ── App ───────────────────────────────────────────────────────────────────────
 function App() {
-  var _DATE_PRESETS$find;
-  var _useState15 = useState(ETOOL_DATA),
-    _useState16 = _slicedToArray(_useState15, 2),
-    etools = _useState16[0],
-    setEtools = _useState16[1];
-  var _useState17 = useState(null),
-    _useState18 = _slicedToArray(_useState17, 2),
-    selected = _useState18[0],
-    setSelected = _useState18[1];
-  var _useState19 = useState(false),
-    _useState20 = _slicedToArray(_useState19, 2),
-    creating = _useState20[0],
-    setCreating = _useState20[1];
+  const [etools, setEtools] = useState(ETOOL_DATA);
+  const [selected, setSelected] = useState(null);
+  const [creating, setCreating] = useState(false);
 
   // top-bar filters
-  var _useState21 = useState(""),
-    _useState22 = _slicedToArray(_useState21, 2),
-    search = _useState22[0],
-    setSearch = _useState22[1];
-  var _useState23 = useState("all"),
-    _useState24 = _slicedToArray(_useState23, 2),
-    dPreset = _useState24[0],
-    setDPreset = _useState24[1];
-  var _useState25 = useState(""),
-    _useState26 = _slicedToArray(_useState25, 2),
-    dFrom = _useState26[0],
-    setDFrom = _useState26[1];
-  var _useState27 = useState(""),
-    _useState28 = _slicedToArray(_useState27, 2),
-    dTo = _useState28[0],
-    setDTo = _useState28[1];
-  var _useState29 = useState(false),
-    _useState30 = _slicedToArray(_useState29, 2),
-    showDrop = _useState30[0],
-    setShowDrop = _useState30[1];
-  var dateRef = useRef();
-  useOutsideClick(dateRef, function () {
-    return setShowDrop(false);
-  });
+  const [search, setSearch] = useState("");
+  const [dPreset, setDPreset] = useState("all");
+  const [dFrom, setDFrom] = useState("");
+  const [dTo, setDTo] = useState("");
+  const [showDrop, setShowDrop] = useState(false);
+  const dateRef = useRef();
+  useOutsideClick(dateRef, () => setShowDrop(false));
 
   // column sort: { col: key, dir: "asc"|"desc" }
-  var _useState31 = useState({
-      col: "created",
-      dir: "desc"
-    }),
-    _useState32 = _slicedToArray(_useState31, 2),
-    sortState = _useState32[0],
-    setSortState = _useState32[1];
+  const [sortState, setSortState] = useState({
+    col: "created",
+    dir: "desc"
+  });
 
   // column header per-column filters (checkbox dropdowns)
-  var _useState33 = useState({}),
-    _useState34 = _slicedToArray(_useState33, 2),
-    colFilters = _useState34[0],
-    setColFilters = _useState34[1];
+  const [colFilters, setColFilters] = useState({});
 
   // filter modal
-  var _useState35 = useState(false),
-    _useState36 = _slicedToArray(_useState35, 2),
-    showFilterModal = _useState36[0],
-    setShowFilterModal = _useState36[1];
-  var _useState37 = useState({}),
-    _useState38 = _slicedToArray(_useState37, 2),
-    modalFilters = _useState38[0],
-    setModalFilters = _useState38[1];
-  var applyPreset = function applyPreset(v) {
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [modalFilters, setModalFilters] = useState({});
+  const applyPreset = v => {
     setDPreset(v);
     if (v !== "custom") {
-      var r = presetRange(v);
+      const r = presetRange(v);
       setDFrom(r.from);
       setDTo(r.to);
       setShowDrop(false);
     }
   };
-  var handleSort = function handleSort(col, dir) {
+  const handleSort = (col, dir) => {
     if (!col) setSortState({
       col: null,
       dir: null
     });else setSortState({
-      col: col,
-      dir: dir
+      col,
+      dir
     });
   };
-  var handleColFilter = function handleColFilter(colKey, vals) {
-    setColFilters(function (p) {
-      return _objectSpread(_objectSpread({}, p), {}, _defineProperty({}, colKey, vals));
-    });
+  const handleColFilter = (colKey, vals) => {
+    setColFilters(p => ({
+      ...p,
+      [colKey]: vals
+    }));
   };
-  var nextId = "ET-".concat(String(etools.length + 1).padStart(3, "0"));
+  const nextId = `ET-${String(etools.length + 1).padStart(3, "0")}`;
 
   // build filter options dynamically from current data
-  var filterOptions = useMemo(function () {
-    return {
-      status: Object.keys(STATUSES).map(function (v) {
-        return {
-          value: v,
-          badge: /*#__PURE__*/React.createElement(Badge, {
-            s: v,
-            small: true
-          })
-        };
-      }),
-      priority: Object.keys(PRIORITIES).map(function (v) {
-        return {
-          value: v,
-          badge: /*#__PURE__*/React.createElement(PriBadge, {
-            p: v,
-            small: true
-          })
-        };
-      }),
-      progress: [{
-        value: "0",
-        label: "Not started (0%)"
-      }, {
-        value: "33",
-        label: "Design done (33%)"
-      }, {
-        value: "67",
-        label: "Proc done (67%)"
-      }, {
-        value: "100",
-        label: "Complete (100%)"
-      }],
-      material: _toConsumableArray(new Set(ETOOL_DATA.map(function (e) {
-        return e.material;
-      }))).sort().map(function (v) {
-        return {
-          value: v,
-          label: v
-        };
-      }),
-      requester: _toConsumableArray(new Set(ETOOL_DATA.map(function (e) {
-        return e.requester;
-      }))).sort().map(function (v) {
-        return {
-          value: v,
-          label: v
-        };
+  const filterOptions = useMemo(() => ({
+    status: Object.keys(STATUSES).map(v => ({
+      value: v,
+      badge: /*#__PURE__*/React.createElement(Badge, {
+        s: v,
+        small: true
       })
-    };
-  }, []);
+    })),
+    priority: Object.keys(PRIORITIES).map(v => ({
+      value: v,
+      badge: /*#__PURE__*/React.createElement(PriBadge, {
+        p: v,
+        small: true
+      })
+    })),
+    progress: [{
+      value: "0",
+      label: "Not started (0%)"
+    }, {
+      value: "33",
+      label: "Design done (33%)"
+    }, {
+      value: "67",
+      label: "Proc done (67%)"
+    }, {
+      value: "100",
+      label: "Complete (100%)"
+    }],
+    material: [...new Set(ETOOL_DATA.map(e => e.material))].sort().map(v => ({
+      value: v,
+      label: v
+    })),
+    requester: [...new Set(ETOOL_DATA.map(e => e.requester))].sort().map(v => ({
+      value: v,
+      label: v
+    }))
+  }), []);
   function progressBucket(etool) {
-    var done = PHASES.filter(function (p) {
-      var _etool$phases$p;
-      return (_etool$phases$p = etool.phases[p]) === null || _etool$phases$p === void 0 ? void 0 : _etool$phases$p.complete;
-    }).length;
+    const done = PHASES.filter(p => etool.phases[p]?.complete).length;
     return String(Math.round(done / PHASES.length * 100));
   }
-  var filtered = useMemo(function () {
-    var mf = modalFilters;
+  const filtered = useMemo(() => {
+    const mf = modalFilters;
     // helper: progress label → bucket value
-    var progressLabelMap = {
+    const progressLabelMap = {
       "Not started (0%)": "0",
       "Design done (33%)": "33",
       "Proc done (67%)": "67",
       "Complete (100%)": "100"
     };
-    var list = etools.filter(function (e) {
-      var q = search.toLowerCase();
-      if (q && ![e.title, e.id, e.partNumber || "", e.material || "", e.requester || ""].some(function (s) {
-        return s.toLowerCase().includes(q);
-      })) return false;
+    let list = etools.filter(e => {
+      const q = search.toLowerCase();
+      if (q && ![e.title, e.id, e.partNumber || "", e.material || "", e.requester || ""].some(s => s.toLowerCase().includes(q))) return false;
       if (!(!dFrom || e.created >= dFrom)) return false;
       if (!(!dTo || e.created <= dTo)) return false;
 
       // column header checkbox filters
-      for (var _i = 0, _Object$entries = Object.entries(colFilters); _i < _Object$entries.length; _i++) {
-        var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
-          col = _Object$entries$_i[0],
-          vals = _Object$entries$_i[1];
+      for (const [col, vals] of Object.entries(colFilters)) {
         if (!vals || vals.length === 0) continue;
         if (col === "status" && !vals.includes(e.status)) return false;
         if (col === "priority" && !vals.includes(e.priority)) return false;
@@ -2699,14 +2437,14 @@ function App() {
       if (mf.createdFrom && e.created < mf.createdFrom) return false;
       if (mf.createdTo && e.created > mf.createdTo) return false;
       if (mf.progress) {
-        var bucket = progressLabelMap[mf.progress];
+        const bucket = progressLabelMap[mf.progress];
         if (bucket && progressBucket(e) !== bucket) return false;
       }
       return true;
     });
     if (sortState.col) {
-      list = _toConsumableArray(list).sort(function (a, b) {
-        var av, bv;
+      list = [...list].sort((a, b) => {
+        let av, bv;
         if (sortState.col === "id") {
           av = a.id;
           bv = b.id;
@@ -2714,13 +2452,11 @@ function App() {
           av = a.title.toLowerCase();
           bv = b.title.toLowerCase();
         } else if (sortState.col === "status") {
-          var _SORD$a$status, _SORD$b$status;
-          av = (_SORD$a$status = SORD[a.status]) !== null && _SORD$a$status !== void 0 ? _SORD$a$status : 9;
-          bv = (_SORD$b$status = SORD[b.status]) !== null && _SORD$b$status !== void 0 ? _SORD$b$status : 9;
+          av = SORD[a.status] ?? 9;
+          bv = SORD[b.status] ?? 9;
         } else if (sortState.col === "priority") {
-          var _PORD$a$priority, _PORD$b$priority;
-          av = (_PORD$a$priority = PORD[a.priority]) !== null && _PORD$a$priority !== void 0 ? _PORD$a$priority : 9;
-          bv = (_PORD$b$priority = PORD[b.priority]) !== null && _PORD$b$priority !== void 0 ? _PORD$b$priority : 9;
+          av = PORD[a.priority] ?? 9;
+          bv = PORD[b.priority] ?? 9;
         } else if (sortState.col === "progress") {
           av = Number(progressBucket(a));
           bv = Number(progressBucket(b));
@@ -2741,89 +2477,55 @@ function App() {
     }
     return list;
   }, [etools, search, dFrom, dTo, colFilters, modalFilters, sortState]);
-  var stats = useMemo(function () {
-    return {
-      showing: filtered.length,
-      total: etools.length,
-      active: filtered.filter(function (e) {
-        return ["In Design", "Procurement", "In Build"].includes(e.status);
-      }).length,
-      complete: filtered.filter(function (e) {
-        return e.status === "Complete";
-      }).length,
-      critical: filtered.filter(function (e) {
-        return e.priority === "Critical";
-      }).length
-    };
-  }, [filtered, etools]);
-  var handleSave = function handleSave(u) {
-    setEtools(function (p) {
-      return p.map(function (e) {
-        return e.id === u.id ? u : e;
-      });
-    });
+  const stats = useMemo(() => ({
+    showing: filtered.length,
+    total: etools.length,
+    active: filtered.filter(e => ["In Design", "Procurement", "In Build"].includes(e.status)).length,
+    complete: filtered.filter(e => e.status === "Complete").length,
+    critical: filtered.filter(e => e.priority === "Critical").length
+  }), [filtered, etools]);
+  const handleSave = u => {
+    setEtools(p => p.map(e => e.id === u.id ? u : e));
     setSelected(u);
   };
-  var handleDelete = function handleDelete(id) {
+  const handleDelete = id => {
     if (window.confirm("Delete this eTool?")) {
-      setEtools(function (p) {
-        return p.filter(function (e) {
-          return e.id !== id;
-        });
-      });
+      setEtools(p => p.filter(e => e.id !== id));
       setSelected(null);
     }
   };
-  var handleAddLog = function handleAddLog(etoolId, entry) {
-    setEtools(function (p) {
-      return p.map(function (e) {
-        return e.id === etoolId ? _objectSpread(_objectSpread({}, e), {}, {
-          log: [].concat(_toConsumableArray(e.log || []), [entry])
-        }) : e;
-      });
-    });
-    setSelected(function (s) {
-      return s && s.id === etoolId ? _objectSpread(_objectSpread({}, s), {}, {
-        log: [].concat(_toConsumableArray(s.log || []), [entry])
-      }) : s;
-    });
+  const handleAddLog = (etoolId, entry) => {
+    setEtools(p => p.map(e => e.id === etoolId ? {
+      ...e,
+      log: [...(e.log || []), entry]
+    } : e));
+    setSelected(s => s && s.id === etoolId ? {
+      ...s,
+      log: [...(s.log || []), entry]
+    } : s);
   };
-  var handleDeleteLog = function handleDeleteLog(etoolId, logId) {
-    setEtools(function (p) {
-      return p.map(function (e) {
-        return e.id === etoolId ? _objectSpread(_objectSpread({}, e), {}, {
-          log: (e.log || []).filter(function (l) {
-            return l.id !== logId;
-          })
-        }) : e;
-      });
-    });
-    setSelected(function (s) {
-      return s && s.id === etoolId ? _objectSpread(_objectSpread({}, s), {}, {
-        log: (s.log || []).filter(function (l) {
-          return l.id !== logId;
-        })
-      }) : s;
-    });
+  const handleDeleteLog = (etoolId, logId) => {
+    setEtools(p => p.map(e => e.id === etoolId ? {
+      ...e,
+      log: (e.log || []).filter(l => l.id !== logId)
+    } : e));
+    setSelected(s => s && s.id === etoolId ? {
+      ...s,
+      log: (s.log || []).filter(l => l.id !== logId)
+    } : s);
   };
-  var modalFilterCount = Object.values(modalFilters).filter(function (v) {
-    return v && v !== "";
-  }).length;
-  var hasFilters = search || dFrom || dTo || Object.values(colFilters).some(function (v) {
-    return v && v.length > 0;
-  }) || modalFilterCount > 0;
-  var clearAll = function clearAll() {
+  const modalFilterCount = Object.values(modalFilters).filter(v => v && v !== "").length;
+  const hasFilters = search || dFrom || dTo || Object.values(colFilters).some(v => v && v.length > 0) || modalFilterCount > 0;
+  const clearAll = () => {
     setSearch("");
     applyPreset("all");
     setColFilters({});
     setModalFilters({});
   };
-  var presetLabel = dPreset === "custom" ? dFrom || dTo ? "".concat(dFrom || "…", " \u2192 ").concat(dTo || "…") : "Custom" : (_DATE_PRESETS$find = DATE_PRESETS.find(function (x) {
-    return x.v === dPreset;
-  })) === null || _DATE_PRESETS$find === void 0 ? void 0 : _DATE_PRESETS$find.label;
-  var filterBarSel = {
+  const presetLabel = dPreset === "custom" ? dFrom || dTo ? `${dFrom || "…"} → ${dTo || "…"}` : "Custom" : DATE_PRESETS.find(x => x.v === dPreset)?.label;
+  const filterBarSel = {
     background: T.bg,
-    border: "1px solid ".concat(T.border),
+    border: `1px solid ${T.border}`,
     borderRadius: 5,
     color: T.textSec,
     fontSize: 12,
@@ -2844,7 +2546,7 @@ function App() {
   }, "eTool Engineering Request Manager"), /*#__PURE__*/React.createElement("div", {
     style: {
       background: T.surface,
-      borderBottom: "1px solid ".concat(T.border),
+      borderBottom: `1px solid ${T.border}`,
       padding: "0 28px",
       position: "sticky",
       top: 0,
@@ -2920,7 +2622,7 @@ function App() {
       fontSize: 10,
       color: T.textMuted,
       background: "transparent",
-      borderLeft: "2px solid ".concat(T.border),
+      borderLeft: `2px solid ${T.border}`,
       paddingLeft: 10,
       letterSpacing: "0.12em",
       fontWeight: 500
@@ -2931,18 +2633,16 @@ function App() {
       fontFamily: "monospace",
       color: T.textMuted,
       background: T.bg,
-      border: "1px solid ".concat(T.border),
+      border: `1px solid ${T.border}`,
       borderRadius: 3,
       padding: "2px 6px",
       letterSpacing: "0.08em"
     }
   }, BUILD)), /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return setCreating(true);
-    },
+    onClick: () => setCreating(true),
     style: {
       background: T.blue,
-      border: "1px solid ".concat(T.blue),
+      border: `1px solid ${T.blue}`,
       borderRadius: 5,
       color: "#fff",
       fontSize: 12,
@@ -2967,7 +2667,7 @@ function App() {
   }, [{
     label: "Showing",
     value: stats.showing,
-    sub: "of ".concat(stats.total, " eTools"),
+    sub: `of ${stats.total} eTools`,
     color: T.text
   }, {
     label: "Active",
@@ -2984,43 +2684,41 @@ function App() {
     value: stats.critical,
     sub: "high priority",
     color: T.danger
-  }].map(function (s) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: s.label,
-      style: {
-        background: T.surface,
-        border: "1px solid ".concat(T.border),
-        borderRadius: 8,
-        padding: "12px 17px"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 10,
-        color: T.textMuted,
-        textTransform: "uppercase",
-        letterSpacing: "0.1em",
-        marginBottom: 4,
-        fontWeight: 500
-      }
-    }, s.label), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 22,
-        fontWeight: 700,
-        color: s.color,
-        letterSpacing: "-0.03em",
-        lineHeight: 1.1
-      }
-    }, s.value), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        color: T.textMuted,
-        marginTop: 2
-      }
-    }, s.sub));
-  })), /*#__PURE__*/React.createElement("div", {
+  }].map(s => /*#__PURE__*/React.createElement("div", {
+    key: s.label,
     style: {
       background: T.surface,
-      border: "1px solid ".concat(T.border),
+      border: `1px solid ${T.border}`,
+      borderRadius: 8,
+      padding: "12px 17px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: T.textMuted,
+      textTransform: "uppercase",
+      letterSpacing: "0.1em",
+      marginBottom: 4,
+      fontWeight: 500
+    }
+  }, s.label), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 22,
+      fontWeight: 700,
+      color: s.color,
+      letterSpacing: "-0.03em",
+      lineHeight: 1.1
+    }
+  }, s.value), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: T.textMuted,
+      marginTop: 2
+    }
+  }, s.sub)))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: T.surface,
+      border: `1px solid ${T.border}`,
       borderRadius: 10,
       padding: "12px 16px",
       marginBottom: 14
@@ -3034,14 +2732,12 @@ function App() {
     }
   }, /*#__PURE__*/React.createElement("input", {
     value: search,
-    onChange: function onChange(e) {
-      return setSearch(e.target.value);
-    },
+    onChange: e => setSearch(e.target.value),
     placeholder: "Search title, part #, material, requester\u2026",
     style: {
       flex: "1 1 200px",
       background: T.bg,
-      border: "1.5px solid ".concat(T.border),
+      border: `1.5px solid ${T.border}`,
       borderRadius: 7,
       color: T.text,
       fontSize: 13,
@@ -3049,26 +2745,18 @@ function App() {
       outline: "none",
       fontFamily: "inherit"
     },
-    onFocus: function onFocus(e) {
-      return e.target.style.borderColor = T.blue;
-    },
-    onBlur: function onBlur(e) {
-      return e.target.style.borderColor = T.border;
-    }
+    onFocus: e => e.target.style.borderColor = T.blue,
+    onBlur: e => e.target.style.borderColor = T.border
   }), /*#__PURE__*/React.createElement("div", {
     ref: dateRef,
     style: {
       position: "relative"
     }
   }, /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return setShowDrop(function (p) {
-        return !p;
-      });
-    },
+    onClick: () => setShowDrop(p => !p),
     style: {
       background: dPreset !== "all" ? T.blueLight : T.bg,
-      border: "1.5px solid ".concat(dPreset !== "all" ? T.blue : T.border),
+      border: `1.5px solid ${dPreset !== "all" ? T.blue : T.border}`,
       borderRadius: 7,
       color: dPreset !== "all" ? T.blue : T.textSec,
       fontSize: 12,
@@ -3089,30 +2777,26 @@ function App() {
       left: 0,
       zIndex: 300,
       background: T.surface,
-      border: "1.5px solid ".concat(T.borderStrong),
+      border: `1.5px solid ${T.borderStrong}`,
       borderRadius: 10,
       padding: "8px 0",
       minWidth: 230,
       boxShadow: "0 8px 28px rgba(0,0,0,0.09)"
     }
-  }, DATE_PRESETS.map(function (p) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: p.v,
-      onClick: function onClick() {
-        return applyPreset(p.v);
-      },
-      style: {
-        padding: "8px 14px",
-        cursor: "pointer",
-        fontSize: 13,
-        fontWeight: dPreset === p.v ? 700 : 400,
-        color: dPreset === p.v ? T.blue : T.text,
-        background: dPreset === p.v ? T.blueLight : "transparent"
-      }
-    }, p.label);
-  }), dPreset === "custom" && /*#__PURE__*/React.createElement("div", {
+  }, DATE_PRESETS.map(p => /*#__PURE__*/React.createElement("div", {
+    key: p.v,
+    onClick: () => applyPreset(p.v),
     style: {
-      borderTop: "1px solid ".concat(T.border),
+      padding: "8px 14px",
+      cursor: "pointer",
+      fontSize: 13,
+      fontWeight: dPreset === p.v ? 700 : 400,
+      color: dPreset === p.v ? T.blue : T.text,
+      background: dPreset === p.v ? T.blueLight : "transparent"
+    }
+  }, p.label)), dPreset === "custom" && /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderTop: `1px solid ${T.border}`,
       paddingTop: 9,
       marginTop: 4,
       padding: "9px 14px 12px"
@@ -3132,48 +2816,34 @@ function App() {
       gap: 7,
       marginBottom: 9
     }
-  }, [["From", dFrom, setDFrom], ["To", dTo, setDTo]].map(function (_ref22) {
-    var _ref23 = _slicedToArray(_ref22, 3),
-      lbl = _ref23[0],
-      val = _ref23[1],
-      set = _ref23[2];
-    return /*#__PURE__*/React.createElement("div", {
-      key: lbl
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 10,
-        color: T.textMuted,
-        marginBottom: 3
-      }
-    }, lbl), /*#__PURE__*/React.createElement("input", {
-      type: "date",
-      value: val,
-      onChange: function onChange(e) {
-        return set(e.target.value);
-      },
-      style: {
-        width: "100%",
-        background: T.bg,
-        border: "1.5px solid ".concat(T.border),
-        borderRadius: 5,
-        color: T.text,
-        fontSize: 11,
-        padding: "5px 7px",
-        outline: "none",
-        fontFamily: "inherit",
-        boxSizing: "border-box"
-      },
-      onFocus: function onFocus(e) {
-        return e.target.style.borderColor = T.blue;
-      },
-      onBlur: function onBlur(e) {
-        return e.target.style.borderColor = T.border;
-      }
-    }));
-  })), /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return setShowDrop(false);
+  }, [["From", dFrom, setDFrom], ["To", dTo, setDTo]].map(([lbl, val, set]) => /*#__PURE__*/React.createElement("div", {
+    key: lbl
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: T.textMuted,
+      marginBottom: 3
+    }
+  }, lbl), /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: val,
+    onChange: e => set(e.target.value),
+    style: {
+      width: "100%",
+      background: T.bg,
+      border: `1.5px solid ${T.border}`,
+      borderRadius: 5,
+      color: T.text,
+      fontSize: 11,
+      padding: "5px 7px",
+      outline: "none",
+      fontFamily: "inherit",
+      boxSizing: "border-box"
     },
+    onFocus: e => e.target.style.borderColor = T.blue,
+    onBlur: e => e.target.style.borderColor = T.border
+  })))), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowDrop(false),
     style: {
       width: "100%",
       background: T.blue,
@@ -3186,12 +2856,10 @@ function App() {
       cursor: "pointer"
     }
   }, "Apply")))), /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return setShowFilterModal(true);
-    },
+    onClick: () => setShowFilterModal(true),
     style: {
       background: modalFilterCount > 0 ? T.blue : T.bg,
-      border: "1px solid ".concat(modalFilterCount > 0 ? T.blue : T.border),
+      border: `1px solid ${modalFilterCount > 0 ? T.blue : T.border}`,
       borderRadius: 5,
       color: modalFilterCount > 0 ? "#fff" : T.textSec,
       fontSize: 12,
@@ -3215,11 +2883,11 @@ function App() {
     stroke: modalFilterCount > 0 ? "#fff" : T.textSec,
     strokeWidth: "1.2",
     strokeLinejoin: "round"
-  })), "Filter", modalFilterCount > 0 ? " (".concat(modalFilterCount, ")") : ""), hasFilters && /*#__PURE__*/React.createElement("button", {
+  })), "Filter", modalFilterCount > 0 ? ` (${modalFilterCount})` : ""), hasFilters && /*#__PURE__*/React.createElement("button", {
     onClick: clearAll,
     style: {
       background: "none",
-      border: "1px solid ".concat(T.border),
+      border: `1px solid ${T.border}`,
       borderRadius: 5,
       color: T.textMuted,
       fontSize: 12,
@@ -3231,7 +2899,7 @@ function App() {
   }, "Clear all \xD7"))), /*#__PURE__*/React.createElement("div", {
     style: {
       background: T.surface,
-      border: "1px solid ".concat(T.border),
+      border: `1px solid ${T.border}`,
       borderRadius: 10,
       overflow: "visible"
     }
@@ -3241,24 +2909,22 @@ function App() {
       gridTemplateColumns: GRID,
       gap: 10,
       padding: "10px 18px",
-      borderBottom: "1px solid ".concat(T.border),
+      borderBottom: `1px solid ${T.border}`,
       background: T.sidebar,
       borderRadius: "10px 10px 0 0",
       alignItems: "center"
     }
-  }, COLS.map(function (col) {
-    return /*#__PURE__*/React.createElement(ColHeader, {
-      key: col.key,
-      label: col.label,
-      colKey: col.key,
-      sortState: sortState,
-      onSort: col.sortable ? handleSort : function () {},
-      filterable: col.filterable,
-      filterOptions: filterOptions[col.key] || [],
-      colFilter: colFilters[col.key] || [],
-      onColFilter: handleColFilter
-    });
-  })), filtered.length === 0 ? /*#__PURE__*/React.createElement("div", {
+  }, COLS.map(col => /*#__PURE__*/React.createElement(ColHeader, {
+    key: col.key,
+    label: col.label,
+    colKey: col.key,
+    sortState: sortState,
+    onSort: col.sortable ? handleSort : () => {},
+    filterable: col.filterable,
+    filterOptions: filterOptions[col.key] || [],
+    colFilter: colFilters[col.key] || [],
+    onColFilter: handleColFilter
+  }))), filtered.length === 0 ? /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: "center",
       padding: "48px 0",
@@ -3280,153 +2946,146 @@ function App() {
     style: {
       fontSize: 12
     }
-  }, "Try adjusting the search, date range, or column filters.")) : filtered.map(function (e, idx) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: e.id,
-      onClick: function onClick() {
-        return setSelected(e);
-      },
-      style: {
-        display: "grid",
-        gridTemplateColumns: GRID,
-        gap: 10,
-        padding: "11px 18px",
-        alignItems: "center",
-        cursor: "pointer",
-        borderBottom: idx < filtered.length - 1 ? "1px solid ".concat(T.border) : "none",
-        transition: "background 0.1s"
-      },
-      onMouseEnter: function onMouseEnter(ev) {
-        return ev.currentTarget.style.background = "#efefef";
-      },
-      onMouseLeave: function onMouseLeave(ev) {
-        return ev.currentTarget.style.background = "transparent";
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        fontFamily: "monospace",
-        color: T.cyan,
-        fontWeight: 600,
-        letterSpacing: "0.06em"
-      }
-    }, e.id), /*#__PURE__*/React.createElement("div", {
-      style: {
-        minWidth: 0
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 13,
-        fontWeight: 600,
-        color: T.text,
-        marginBottom: 3,
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap"
-      }
-    }, e.title), /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        gap: 7,
-        alignItems: "center"
-      }
-    }, /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 11,
-        color: T.textMuted,
-        fontFamily: "monospace"
-      }
-    }, e.partNumber), /*#__PURE__*/React.createElement(PhaseChips, {
-      phases: e.phases
-    }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Badge, {
-      s: e.status,
-      small: true
-    })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(PriBadge, {
-      p: e.priority,
-      small: true
-    })), /*#__PURE__*/React.createElement(ProgBar, {
-      phases: e.phases
-    }), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 12,
-        color: T.textSec,
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap"
-      }
-    }, e.material), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 12,
-        color: T.textSec,
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap"
-      }
-    }, e.requester), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 12,
-        color: T.textMuted
-      }
-    }, e.created), /*#__PURE__*/React.createElement("button", {
-      onClick: function onClick(ev) {
-        ev.stopPropagation();
-        handleDelete(e.id);
-      },
-      style: {
-        background: "none",
-        border: "none",
-        color: T.textMuted,
-        cursor: "pointer",
-        fontSize: 15,
-        borderRadius: 4,
-        padding: "3px 6px",
-        lineHeight: 1
-      },
-      title: "Delete"
-    }, "\xD7"));
-  })), /*#__PURE__*/React.createElement("div", {
+  }, "Try adjusting the search, date range, or column filters.")) : filtered.map((e, idx) => /*#__PURE__*/React.createElement("div", {
+    key: e.id,
+    onClick: () => setSelected(e),
+    style: {
+      display: "grid",
+      gridTemplateColumns: GRID,
+      gap: 10,
+      padding: "11px 18px",
+      alignItems: "center",
+      cursor: "pointer",
+      borderBottom: idx < filtered.length - 1 ? `1px solid ${T.border}` : "none",
+      transition: "background 0.1s"
+    },
+    onMouseEnter: ev => ev.currentTarget.style.background = "#efefef",
+    onMouseLeave: ev => ev.currentTarget.style.background = "transparent"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      fontFamily: "monospace",
+      color: T.cyan,
+      fontWeight: 600,
+      letterSpacing: "0.06em"
+    }
+  }, e.id), /*#__PURE__*/React.createElement("div", {
+    style: {
+      minWidth: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      color: T.text,
+      marginBottom: 3,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap"
+    }
+  }, e.title), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 7,
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 11,
+      color: T.textMuted,
+      fontFamily: "monospace"
+    }
+  }, e.partNumber), /*#__PURE__*/React.createElement(PhaseChips, {
+    phases: e.phases
+  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Badge, {
+    s: e.status,
+    small: true
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(PriBadge, {
+    p: e.priority,
+    small: true
+  })), /*#__PURE__*/React.createElement(ProgBar, {
+    phases: e.phases
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: T.textSec,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap"
+    }
+  }, e.material), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: T.textSec,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap"
+    }
+  }, e.requester), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: T.textMuted
+    }
+  }, e.created), /*#__PURE__*/React.createElement("button", {
+    onClick: ev => {
+      ev.stopPropagation();
+      handleDelete(e.id);
+    },
+    style: {
+      background: "none",
+      border: "none",
+      color: T.textMuted,
+      cursor: "pointer",
+      fontSize: 15,
+      borderRadius: 4,
+      padding: "3px 6px",
+      lineHeight: 1
+    },
+    title: "Delete"
+  }, "\xD7")))), /*#__PURE__*/React.createElement("div", {
     style: {
       marginTop: 10,
       fontSize: 12,
       color: T.textMuted,
       textAlign: "right"
     }
-  }, filtered.length, " result", filtered.length !== 1 ? "s" : "", hasFilters ? " \xB7 filtered from ".concat(etools.length) : "")), selected && /*#__PURE__*/React.createElement(DetailModal, {
+  }, filtered.length, " result", filtered.length !== 1 ? "s" : "", hasFilters ? ` · filtered from ${etools.length}` : "")), selected && /*#__PURE__*/React.createElement(DetailModal, {
     etool: selected,
-    onClose: function onClose() {
-      return setSelected(null);
-    },
+    onClose: () => setSelected(null),
     onSave: handleSave,
     onDelete: handleDelete,
     onAddLog: handleAddLog,
     onDeleteLog: handleDeleteLog
   }), creating && /*#__PURE__*/React.createElement(CreateModal, {
-    onClose: function onClose() {
-      return setCreating(false);
-    },
-    onCreate: function onCreate(e) {
-      return setEtools(function (p) {
-        return [e].concat(_toConsumableArray(p));
-      });
-    },
+    onClose: () => setCreating(false),
+    onCreate: e => setEtools(p => [e, ...p]),
     nextId: nextId
   }), showFilterModal && /*#__PURE__*/React.createElement(FilterModal, {
     current: modalFilters,
     onApply: setModalFilters,
-    onClose: function onClose() {
-      return setShowFilterModal(false);
-    }
+    onClose: () => setShowFilterModal(false)
   }));
 }
 
+  window.App = App;
+})(window.React, window.ReactDOM);
   </script>
+
+  <!-- 3. Mount — React and App are guaranteed defined by this point -->
   <script>
     (function () {
       try {
-        ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+        if (typeof window.App !== 'function') {
+          throw new Error('App component not found. Build may be corrupted.');
+        }
+        ReactDOM.createRoot(document.getElementById('root')).render(
+          React.createElement(window.App)
+        );
         var loader = document.getElementById('loading');
         loader.classList.add('fade');
-        setTimeout(function () { if (loader.parentNode) loader.parentNode.removeChild(loader); }, 350);
+        setTimeout(function () {
+          if (loader.parentNode) loader.parentNode.removeChild(loader);
+        }, 350);
       } catch (err) {
         console.error('eTool Manager v20260519-ca785a8 mount error:', err);
         document.getElementById('loading').innerHTML =
@@ -3437,5 +3096,6 @@ function App() {
       }
     }());
   </script>
+
 </body>
 </html>
