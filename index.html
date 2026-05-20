@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>eTool Manager — Engineering</title>
-  <meta name="description" content="eTool engineering request management — design, procurement and build tracking." />
+  <meta name="description" content="eTool engineering request management." />
   <!-- build: v20260519-ca785a8 -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2336454f'/><rect x='5' y='5' width='9' height='9' rx='2' fill='white'/><rect x='18' y='5' width='9' height='9' rx='2' fill='white'/><rect x='5' y='18' width='9' height='9' rx='2' fill='white'/><rect x='18' y='18' width='9' height='9' rx='2' fill='white'/></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -54,33 +54,26 @@
 
   <div id="root"></div>
 
-  <!--
-    DEPLOYMENT NOTE
-    This file is fully self-contained. Push ONLY index.html to GitHub Pages.
-    Do NOT push etool-manager.jsx — it will cause "exports is not defined"
-    errors if the browser loads it as a module.
+  <!-- build: v20260519-ca785a8 | push only index.html + .nojekyll to GitHub Pages -->
 
-    Build: v20260519-ca785a8
-    GitHub Pages: Settings > Pages > Source = main branch /root (or /docs)
-  -->
-
-  <!-- 1. React 18 UMD — must load before the app script below -->
+  <!-- 1. React 18 UMD globals -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-  <!-- 2. App — pre-compiled plain JS, wrapped in IIFE, sets window.App -->
+  <!-- 2. App — compiled JS, self-contained IIFE, sets window.App -->
   <script>
-/* eTool Manager v20260519-ca785a8 — pre-compiled via Babel, do not edit */
-(function(React, ReactDOM) {
+/* eTool Manager v20260519-ca785a8 — pre-compiled, do not edit */
+(function() {
   "use strict";
-  // Expose App to global scope for mount script
-  var _appExport;
-const {
-  useState,
-  useMemo,
-  useRef,
-  useEffect
-} = React;
+
+  // Bind React hooks from the UMD global — must be inside this IIFE
+  var React    = window.React;
+  var ReactDOM = window.ReactDOM;
+  var useState  = React.useState;
+  var useMemo   = React.useMemo;
+  var useRef    = React.useRef;
+  var useEffect = React.useEffect;
+
 const BUILD = "ca785a8";
 
 // Charcoal #36454f · Slate Gray #708090 · Light Gray #d3d3d3 · White #ffffff
@@ -3067,17 +3060,17 @@ function App() {
   }));
 }
 
+
+  // Expose to mount script
   window.App = App;
-})(window.React, window.ReactDOM);
+})();
   </script>
 
-  <!-- 3. Mount — React and App are guaranteed defined by this point -->
+  <!-- 3. Mount -->
   <script>
     (function () {
       try {
-        if (typeof window.App !== 'function') {
-          throw new Error('App component not found. Build may be corrupted.');
-        }
+        if (typeof window.App !== 'function') throw new Error('App not defined');
         ReactDOM.createRoot(document.getElementById('root')).render(
           React.createElement(window.App)
         );
@@ -3087,12 +3080,12 @@ function App() {
           if (loader.parentNode) loader.parentNode.removeChild(loader);
         }, 350);
       } catch (err) {
-        console.error('eTool Manager v20260519-ca785a8 mount error:', err);
+        console.error('mount error:', err);
         document.getElementById('loading').innerHTML =
-          '<div style="text-align:center;padding:48px 24px;max-width:420px">' +
-          '<div style="font-size:15px;font-weight:700;color:#7a3535;margin-bottom:10px">Failed to start</div>' +
-          '<div style="font-size:12px;color:#708090;font-family:monospace;line-height:1.6">' +
-          err.message + '<br><br>Build: v20260519-ca785a8</div></div>';
+          '<div style="text-align:center;padding:48px 24px">' +
+          '<div style="font-size:15px;font-weight:700;color:#7a3535;margin-bottom:8px">Failed to start</div>' +
+          '<div style="font-size:12px;color:#708090;font-family:monospace">' + err.message +
+          '<br><br>v20260519-ca785a8</div></div>';
       }
     }());
   </script>
